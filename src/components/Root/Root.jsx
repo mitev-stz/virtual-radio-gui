@@ -5,7 +5,7 @@ import Home from '../Home/Home';
 import About from '../About/About';
 import VirtualRadio from '../VirtualRadio/VirtualRadio';
 
-// import './assets/styles/index.css';
+import './assets/styles/index.css';
 
 const Root = () =>(
   <Router>
