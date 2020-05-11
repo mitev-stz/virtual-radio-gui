@@ -2,12 +2,16 @@ stages:
   - build
   - deploy
 
+cache:
+  paths:
+  - node_modules/
+
 build:
   stage: build
   script:
     - echo "Building deploy package"
-    - yarn install
-    - yarn build
+    - npm install
+    - npm run-script build
     - echo "Build successful"
   artifacts:
     expire_in: 1 hour
@@ -17,10 +21,5 @@ deploy_production:
   stage: deploy
   script:
         - echo "Deploying to server"
-        - cp -rv build/* /var/www/html/<destination_folder>/
+        - npm run-script deploy
         - echo "Deployed"
-    environment:
-        name: production
-        url: "https://mitev-stz.github.io/virtual-radio-gui/"
-    only:
-        - master
