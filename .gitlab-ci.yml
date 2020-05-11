@@ -22,3 +22,5 @@ deploy_production:
     environment:
         name: production
         url: "https://mitev-stz.github.io/virtual-radio-gui/"
+    only:
+        - master
