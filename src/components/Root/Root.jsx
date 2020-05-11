@@ -13,13 +13,13 @@ const Root = () =>(
       <nav>
           <ul>
             <li>
-              <Link to="/">Home</Link>
+              <Link to="/virtual-radio-gui">Home</Link>
             </li>
             <li>
-              <Link to="/virtualRadio">VirtualRadio</Link>
+              <Link to="/virtual-radio-gui/virtualRadio">VirtualRadio</Link>
             </li>
             <li>
-              <Link to="/about">About</Link>
+              <Link to="/virtual-radio-gui/about">About</Link>
             </li>
 
           </ul>
