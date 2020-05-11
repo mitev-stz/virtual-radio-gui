@@ -26,9 +26,9 @@ const Root = () =>(
       </nav>
     </div>
     <Switch>
-      <Route exact path="/" component={Home}/>
-      <Route exact path="/about" component={About}/>
-      <Route exact path="/virtualRadio" component={VirtualRadio}/>
+      <Route exact path="/virtual-radio-gui/" component={Home}/>
+      <Route exact path="/virtual-radio-gui/about" component={About}/>
+      <Route exact path="/virtual-radio-gui/virtualRadio" component={VirtualRadio}/>
     </Switch>
   </Router>
 );
