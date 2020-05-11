@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "83c79135a6a517d5064282fcb01499d9",
+    "revision": "a3ed49535d645783ad326a0e3bb60e1d",
     "url": "/virtual-radio-gui/index.html"
   },
   {
-    "revision": "d4284271b7f05f81cb68",
+    "revision": "960d73442177305cafd5",
     "url": "/virtual-radio-gui/static/css/main.3d3f11d6.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/virtual-radio-gui/static/js/2.58154a02.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "d4284271b7f05f81cb68",
-    "url": "/virtual-radio-gui/static/js/main.c93e684e.chunk.js"
+    "revision": "960d73442177305cafd5",
+    "url": "/virtual-radio-gui/static/js/main.1d1ad99e.chunk.js"
   },
   {
     "revision": "53686d8caf58bb348dfa",
