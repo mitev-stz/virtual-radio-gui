@@ -23,5 +23,6 @@ deploy_production:
   stage: deploy
   script:
         - echo "Deploying to server"
+        - npm add gh-pages
         - npm run-script deploy
         - echo "Deployed"
