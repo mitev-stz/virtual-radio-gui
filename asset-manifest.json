@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/virtual-radio-gui/static/css/main.3d3f11d6.chunk.css",
-    "main.js": "/virtual-radio-gui/static/js/main.1d1ad99e.chunk.js",
-    "main.js.map": "/virtual-radio-gui/static/js/main.1d1ad99e.chunk.js.map",
+    "main.js": "/virtual-radio-gui/static/js/main.db929de7.chunk.js",
+    "main.js.map": "/virtual-radio-gui/static/js/main.db929de7.chunk.js.map",
     "runtime-main.js": "/virtual-radio-gui/static/js/runtime-main.337f05ae.js",
     "runtime-main.js.map": "/virtual-radio-gui/static/js/runtime-main.337f05ae.js.map",
     "static/js/2.58154a02.chunk.js": "/virtual-radio-gui/static/js/2.58154a02.chunk.js",
     "static/js/2.58154a02.chunk.js.map": "/virtual-radio-gui/static/js/2.58154a02.chunk.js.map",
     "index.html": "/virtual-radio-gui/index.html",
-    "precache-manifest.9e944c130e3b31f1914673140e40bb7e.js": "/virtual-radio-gui/precache-manifest.9e944c130e3b31f1914673140e40bb7e.js",
+    "precache-manifest.d9a02906ebc4df636df5c0e764b2537a.js": "/virtual-radio-gui/precache-manifest.d9a02906ebc4df636df5c0e764b2537a.js",
     "service-worker.js": "/virtual-radio-gui/service-worker.js",
     "static/css/main.3d3f11d6.chunk.css.map": "/virtual-radio-gui/static/css/main.3d3f11d6.chunk.css.map",
     "static/js/2.58154a02.chunk.js.LICENSE.txt": "/virtual-radio-gui/static/js/2.58154a02.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.337f05ae.js",
     "static/js/2.58154a02.chunk.js",
     "static/css/main.3d3f11d6.chunk.css",
-    "static/js/main.1d1ad99e.chunk.js"
+    "static/js/main.db929de7.chunk.js"
   ]
 }

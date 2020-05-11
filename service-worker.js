@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/virtual-radio-gui/precache-manifest.9e944c130e3b31f1914673140e40bb7e.js"
+  "/virtual-radio-gui/precache-manifest.d9a02906ebc4df636df5c0e764b2537a.js"
 );
 
 self.addEventListener('message', (event) => {
