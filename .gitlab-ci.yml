@@ -2,6 +2,7 @@ image: node:12.14.0
 
 stages:
   - build
+  - test
   - deploy
 
 cache:
@@ -19,10 +20,17 @@ build:
     expire_in: 1 hour
     paths:
         - build
-deploy_production:
-  stage: deploy
+test:
+  stage: test
   script:
-        - echo "Deploying to server"
-        - npm add gh-pages
-        - npm run-script deploy
-        - echo "Deployed"
+    - echo "Running tests"
+    - npm run-script test
+    - echo "Test successful"
+    
+# deploy_production:
+#   stage: deploy
+#   script:
+#         - echo "Deploying to server"
+#         - npm add gh-pages
+#         - npm run-script deploy
+#         - echo "Deployed"
