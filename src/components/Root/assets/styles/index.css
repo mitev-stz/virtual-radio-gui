@@ -6,7 +6,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+html{
+  height: 100%;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -22,4 +24,31 @@ code {
   justify-content: center;
   align-items: center;
   min-height: 100%;
+}
+.header-background{
+  background-color: #f3f39c;
+}
+.content-flex-end{
+  display: flex;
+  justify-content: flex-end;
+}
+.content-flex-center{
+  display: flex;
+  justify-content: center;
+}
+.content-flex-start{
+  display: flex;
+  justify-content: center;
+}
+.component-container{
+  max-width: 100%;
+}
+.bordered-component{
+  border: 1px solid #c3c3c3;
+}
+.footer{
+  height: 10%;
+}
+.header{
+  height: 8%;
 }
