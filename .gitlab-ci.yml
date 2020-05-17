@@ -26,11 +26,13 @@ test:
     - echo "Running tests"
     - npm run-script test
     - echo "Test successful"
-    
-# deploy_production:
-#   stage: deploy
-#   script:
-#         - echo "Deploying to server"
-#         - npm add gh-pages
-#         - npm run-script deploy
-#         - echo "Deployed"
+
+deploy_production:
+  stage: deploy
+  script:
+    - echo "Deploying to server"
+    - git config --global user.email "yordan.mitev99@gmail.com"
+    - git config --global user.name "Yordan Mitev"
+    - npm add gh-pages
+    - npm run-script deploy
+    - echo "Deployed"
