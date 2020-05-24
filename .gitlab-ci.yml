@@ -37,8 +37,3 @@ deploy_production:
     - dpl --provider=heroku --app=awesomeradio --api-key=$HEROKU_API_KEY
   only:
     - master
-#   image: alpinelab/ruby-dev
-#   stage: deploy
-#   script:
-#     - gem install dpl
-#     - dpl --provider=heroku --app=awesomeradio --api-key=$HEROKU_API_KEY
