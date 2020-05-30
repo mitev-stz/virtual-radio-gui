@@ -1,15 +1,19 @@
 import React from 'react';
 
 class PowerSwitch extends React.Component {
-  state = {
-    powerOn: false
-  }
   render () {
-    return (
-        <div className="power-switch">
-          PowerSwitch 
-        </div>
-      );
+    const{onPowerOn, onPowerOff} = this.props;
+      return (
+          <div className="power-switch">
+            <button className={this.getBtnOnClasses()} onClick={onPowerOn}>On</button>
+            <button className="powerButton-off" onClick={onPowerOff}>Off</button>
+          </div>
+        );
+  }
+  getBtnOnClasses(){
+    let classes = "powerButton-on ";
+    classes+= this.props.isRadioLive? "powerButton-on-active" : "";
+    return classes;
   }
 }
 

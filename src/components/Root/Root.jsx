@@ -29,8 +29,10 @@ const Root = () =>(
       <Route exact path="/about" component={About}/>
       <Route exact path="/virtualRadio" component={VirtualRadio}/>
     </Switch>
-    <div className="footer container">
-      contact me here!
+    <div className="footer centered-container">
+      <div className="footer-bottom">
+        Footer contact me here!
+      </div>
     </div>
   </Router>
 );

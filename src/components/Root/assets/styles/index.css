@@ -48,6 +48,18 @@ code {
 }
 .footer{
   height: 10%;
+  display: inline-block;
+  position: relative;
+  max-width: 50%;
+  min-width: 20%;
+  padding: 10px 20px;
+  background: rgba(202, 189, 102, 0.62);
+  color: #9c3b3b;
+  border-radius: 4px;
+}
+.footer-bottom{
+  position: absolute;
+  bottom: 0px;
 }
 .header{
   height: 8%;

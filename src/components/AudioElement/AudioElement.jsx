@@ -2,9 +2,10 @@ import React from 'react';
 
 class AudioElement extends React.Component{
   render() {
+    const { id, source} = this.props;
     return (
-      <audio id={this.props.data.id}>
-        <source scr={this.props.data.media_file} type="mpeg"></source>
+      <audio id={id}>
+        <source scr={source} type="mpeg"></source>
       </audio>
     );
   }
