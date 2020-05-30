@@ -19,12 +19,19 @@ class VirtualRadio extends React.Component{
         pressTunerTimer: null,
         volumeValue: 0.4
     };
+
+    bindHandleMethods(){
+      this.handleClickPowerOn = this.handleClickOnPowerBtn.bind(this, true);
+      this.handleClickPowerOff = this.handleClickOnPowerBtn.bind(this, false);
+      this.handleCallbackFromTuner = this.handleCallbackFromTuner.bind(this);
+    }
+
     componentDidMount(){
       this.retrieveData()
     }
 
   render() {
-    const { isRadioLive, data, isDataLoaded, errorOnLoad} = this.state;
+    const { isRadioLive, data, isDataLoaded, errorOnLoad, targetFreq} = this.state;
     if(errorOnLoad){
       return <div> Error: {errorOnLoad}</div>
     } else if (!isDataLoaded) {
@@ -35,10 +42,8 @@ class VirtualRadio extends React.Component{
           <div className="centered-context">
             Virtual Radio is here.
             <Tuner
-              onIncrBtnUp={this.handleFreqIncrUp}
-              onIncrBtnDown={this.handleFreqIncrDown}
-              onDecrBtnUp={this.handleFreqDecrUp}
-              onDecrBtnDown={this.handleFreqDecrDown}
+              targetFreq = {targetFreq}
+              parentCallback = {this.handleCallbackFromTuner}
               ></Tuner>
             <PowerSwitch
               onPowerOn={this.handleClickPowerOn}
@@ -56,14 +61,6 @@ class VirtualRadio extends React.Component{
 
     }
   }
-  bindHandleMethods(){
-    this.handleClickPowerOn = this.handleClickPower.bind(this, true);
-    this.handleClickPowerOff = this.handleClickPower.bind(this, false);
-    this.handleFreqIncrUp = this.handleFreqUp.bind(this, true);
-    this.handleFreqDecrUp = this.handleFreqUp.bind(this, false);
-    this.handleFreqIncrDown = this.handleFreqDown.bind(this, true);
-    this.handleFreqDecrDown = this.handleFreqDown.bind(this, false);
-  }
 
   changeVolumeValue = (volumeControllerData) => {
     this.setState({
@@ -71,30 +68,33 @@ class VirtualRadio extends React.Component{
     })
   }
 
-  handleClickPower(state){
+  handleClickOnPowerBtn(state){
     this.setState({
       isRadioLive:state
     });
   }
-  handleFreqUp(isIncrease){
-    clearTimeout(this.pressTunerTimer);
-  }
-  handleFreqDown(isIncrease){
-    console.log("alt:", this.state.targetFreq);
-    let newFreq = this.state.targetFreq;
+  handleCallbackFromTuner = (freqFromTuner) => {
     this.setState({
-        pressTunerTimer: window.setTimeout(function() {
-          if(isIncrease){
-            if(newFreq+0.1<=20) newFreq += 0.1;
-          } else if(newFreq-0.1>=0) newFreq -= 0.1;
-          this.setState({
-            targetFreq: newFreq
-          });
-        },20)
-      })
-      console.log("new:", this.state.targetFreq);
-      return false;
+      targetFreq: freqFromTuner
+    })
+    console.log("targetFreq",this.state.targetFreq,"freqFromTuner", freqFromTuner);
   }
+
+  // onFreqDownDone(isIncrease){
+  //
+  //   // console.log("alt:", this.state.targetFreq);
+  //   // let newFreq = this.state.targetFreq;
+  //   // this.setState({
+  //   //     pressTunerTimer: window.setInterval(function() {
+  //   //       if(isIncrease){
+  //   //         if(newFreq+0.1<=20) newFreq += 0.1;
+  //   //       } else if(newFreq-0.1>=0) newFreq -= 0.1;
+  //   //
+  //   //     },100)
+  //   //   })
+  //   //   console.log("new:", this.state.targetFreq);
+  //   //   return false;
+  // }
 
   retrieveData(){
     axios.get("https://radio.ethylomat.de/api/v1/channels/")
