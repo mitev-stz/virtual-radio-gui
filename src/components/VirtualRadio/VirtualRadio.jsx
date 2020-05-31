@@ -4,6 +4,7 @@ import AudioList from "../AudioList/AudioList";
 import PowerSwitch from "../PowerSwitch/PowerSwitch";
 import Tuner from "../Tuner/Tuner";
 import VolumeController from "../VolumeController/VolumeController";
+import Retina from "../Retina/Retina";
 
 class VirtualRadio extends React.Component{
   constructor(props){
@@ -16,7 +17,6 @@ class VirtualRadio extends React.Component{
         isDataLoaded: false,
         errorOnLoad: null,
         isRadioLive: false,
-        pressTunerTimer: null,
         volumeValue: 0.4
     };
 
@@ -56,6 +56,10 @@ class VirtualRadio extends React.Component{
               parentCallback={this.changeVolumeValue}
               volumeValue={this.state.volumeValue}>
             </VolumeController>
+            <Retina
+              targetFreq={targetFreq}
+              isRadioLive={isRadioLive}>
+            </Retina>
             <div className="container"> Volume In Radio Component: {volumeValue}</div>
           </div>
           <AudioList audios={data}> </AudioList>
@@ -75,6 +79,7 @@ class VirtualRadio extends React.Component{
     this.setState({
       isRadioLive:state
     });
+    console.log("isRadioLive", this.state.isRadioLive);
   }
 
   handleCallbackFromTuner = (freqFromTuner) => {
