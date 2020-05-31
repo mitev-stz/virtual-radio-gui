@@ -7,7 +7,7 @@ import VolumeController from "../VolumeController/VolumeController";
 
 class VirtualRadio extends React.Component{
   constructor(props){
-    super(props)
+    super(props);
     this.bindHandleMethods();
   }
     state = {
@@ -24,6 +24,7 @@ class VirtualRadio extends React.Component{
       this.handleClickPowerOn = this.handleClickOnPowerBtn.bind(this, true);
       this.handleClickPowerOff = this.handleClickOnPowerBtn.bind(this, false);
       this.handleCallbackFromTuner = this.handleCallbackFromTuner.bind(this);
+      this.changeVolumeValue = this.changeVolumeValue.bind(this);
     }
 
     componentDidMount(){
@@ -31,7 +32,7 @@ class VirtualRadio extends React.Component{
     }
 
   render() {
-    const { isRadioLive, data, isDataLoaded, errorOnLoad, targetFreq} = this.state;
+    const { isRadioLive, data, isDataLoaded, errorOnLoad, targetFreq, volumeValue} = this.state;
     if(errorOnLoad){
       return <div> Error: {errorOnLoad}</div>
     } else if (!isDataLoaded) {
@@ -42,9 +43,10 @@ class VirtualRadio extends React.Component{
           <div className="centered-context">
             Virtual Radio is here.
             <Tuner
-              targetFreq = {targetFreq}
+              targetFreq={targetFreq}
               parentCallback = {this.handleCallbackFromTuner}
               ></Tuner>
+            <div>targetFreq: {targetFreq} </div>
             <PowerSwitch
               onPowerOn={this.handleClickPowerOn}
               onPowerOff={this.handleClickPowerOff}
@@ -54,6 +56,7 @@ class VirtualRadio extends React.Component{
               parentCallback={this.changeVolumeValue}
               volumeValue={this.state.volumeValue}>
             </VolumeController>
+            <div className="container"> Volume In Radio Component: {volumeValue}</div>
           </div>
           <AudioList audios={data}> </AudioList>
         </div>
@@ -73,28 +76,14 @@ class VirtualRadio extends React.Component{
       isRadioLive:state
     });
   }
-  handleCallbackFromTuner = (freqFromTuner) => {
-    this.setState({
-      targetFreq: freqFromTuner
-    })
-    console.log("targetFreq",this.state.targetFreq,"freqFromTuner", freqFromTuner);
-  }
 
-  // onFreqDownDone(isIncrease){
-  //
-  //   // console.log("alt:", this.state.targetFreq);
-  //   // let newFreq = this.state.targetFreq;
-  //   // this.setState({
-  //   //     pressTunerTimer: window.setInterval(function() {
-  //   //       if(isIncrease){
-  //   //         if(newFreq+0.1<=20) newFreq += 0.1;
-  //   //       } else if(newFreq-0.1>=0) newFreq -= 0.1;
-  //   //
-  //   //     },100)
-  //   //   })
-  //   //   console.log("new:", this.state.targetFreq);
-  //   //   return false;
-  // }
+  handleCallbackFromTuner = (freqFromTuner) => {
+    let newFreq = freqFromTuner.toFixed(2);
+    this.setState({
+      targetFreq: newFreq
+    })
+    console.log("targetFreq:",this.state.targetFreq,"freqFromTuner:", freqFromTuner.toFixed(2));
+  }
 
   retrieveData(){
     axios.get("https://radio.ethylomat.de/api/v1/channels/")
@@ -113,7 +102,5 @@ class VirtualRadio extends React.Component{
     });
   }
 }
-
-
 
 export default VirtualRadio;

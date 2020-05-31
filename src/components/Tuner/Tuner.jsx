@@ -3,16 +3,17 @@ import React from 'react';
 
 class Tuner extends React.Component {
   constructor(props){
-    super(props)
-    this.onIncrDown = this.onIncrDown.bind(this, true);
-    this.onDecrDown = this.onIncrDown.bind(this, false);
+    super(props);
+    this.onIncrDown = this.onIncrDown.bind(this);
+    this.onDecrDown = this.onDecrDown.bind(this);
     this.onIncUp = this.onIncUp.bind(this);
+    this.intervalId = null;
+  }
 
-  }
   state = {
-    intervalId: null,
-    targetFreq: this.props.targetFreq
+    targetFreq:this.props.targetFreq
   }
+
   render () {
     return (
       <div className="container">
@@ -22,22 +23,35 @@ class Tuner extends React.Component {
       </div>
     );
   }
-  onIncrDown(isIncrease){
-    let newFreq = this.state.targetFreq;
-    var intervalId2 = window.setInterval(function() {
-      if(isIncrease){
-        if(newFreq+0.1<=20) newFreq += 0.1;
-      } else if(newFreq-0.1>=0) newFreq -= 0.1;
-      this.setState({targetFreq:newFreq});
-      console.log("newFreq",newFreq);
-      this.props.parentCallback(newFreq);
-    },1000);
-    this.setState({intervalId: intervalId2});
+  onDecrDown(){
+    this.intervalId = window.setInterval(() => {
+      this.updateIntervalDecr();
+    },50);
+  }
+  onIncrDown(){
+    this.intervalId = window.setInterval(() => {
+      this.updateIntervalIncr();
+    },50);
   }
 
+  updateIntervalIncr(){
+      if(this.state.targetFreq+0.1<=20) {
+        this.setState((state) => {
+          return {targetFreq: state.targetFreq+=0.05};
+        });
+        this.props.parentCallback(this.state.targetFreq);
+      }
+    }
+    updateIntervalDecr(){
+      if(this.state.targetFreq-0.1>=0) {
+      this.setState((state) =>{
+        return {targetFreq: state.targetFreq-=0.05};
+      });
+      this.props.parentCallback(this.state.targetFreq);
+    }
+  }
   onIncUp(){
-    console.log("intervalid:",this.state.intervalId);
-    clearInterval(this.state.intervalId);
+    clearInterval(this.intervalId);
   }
 }
 

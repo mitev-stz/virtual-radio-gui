@@ -1,4 +1,5 @@
 import React from 'react';
+import "./assets/styles/powerSwitch.css"
 
 class PowerSwitch extends React.Component {
   render () {
