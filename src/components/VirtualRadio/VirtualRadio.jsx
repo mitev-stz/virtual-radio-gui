@@ -5,6 +5,7 @@ import PowerSwitch from "../PowerSwitch/PowerSwitch";
 import Tuner from "../Tuner/Tuner";
 import VolumeController from "../VolumeController/VolumeController";
 import Retina from "../Retina/Retina";
+import QuickChannelButtonList from "../QuickChannelButtonList/QuickChannelButtonList";
 
 class VirtualRadio extends React.Component{
   constructor(props){
@@ -25,6 +26,7 @@ class VirtualRadio extends React.Component{
       this.handleClickPowerOff = this.handleClickOnPowerBtn.bind(this, false);
       this.handleCallbackFromTuner = this.handleCallbackFromTuner.bind(this);
       this.changeVolumeValue = this.changeVolumeValue.bind(this);
+      this.handleQuickChannelButtonClick = this.handleQuickChannelButtonClick.bind(this);
     }
 
     componentDidMount(){
@@ -60,6 +62,10 @@ class VirtualRadio extends React.Component{
               targetFreq={targetFreq}
               isRadioLive={isRadioLive}>
             </Retina>
+            <QuickChannelButtonList
+              data={data}
+              parentCallback={this.handleQuickChannelButtonClick}>
+            </QuickChannelButtonList>
             <div className="container"> Volume In Radio Component: {volumeValue}</div>
           </div>
           <AudioList audios={data}> </AudioList>
@@ -72,22 +78,27 @@ class VirtualRadio extends React.Component{
   changeVolumeValue = (volumeControllerData) => {
     this.setState({
       volumeValue: volumeControllerData
-    })
+    });
   }
 
   handleClickOnPowerBtn(state){
     this.setState({
       isRadioLive:state
     });
-    console.log("isRadioLive", this.state.isRadioLive);
   }
 
   handleCallbackFromTuner = (freqFromTuner) => {
     let newFreq = freqFromTuner.toFixed(2);
     this.setState({
       targetFreq: newFreq
-    })
-    console.log("targetFreq:",this.state.targetFreq,"freqFromTuner:", freqFromTuner.toFixed(2));
+    });
+  }
+  handleQuickChannelButtonClick = (channelID) => {
+    console.log(this.state.data.filter(channel => channel.id === channelID));
+    console.log(channelID);
+    this.setState({
+      targetFreq: this.state.data.filter(channel => channel.id === channelID)[0].frequency
+    });
   }
 
   retrieveData(){
@@ -103,7 +114,7 @@ class VirtualRadio extends React.Component{
       this.setState({
         isDataLoaded: true,
         errorOnLoad: err
-      })
+      });
     });
   }
 }
