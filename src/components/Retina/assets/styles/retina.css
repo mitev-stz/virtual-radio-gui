@@ -1,3 +1,6 @@
 .live-active{
   color: red;
 }
+.retina-container{
+  border: 1px solid black;
+}

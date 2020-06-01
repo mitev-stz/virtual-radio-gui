@@ -6,6 +6,7 @@ import Tuner from "../Tuner/Tuner";
 import VolumeController from "../VolumeController/VolumeController";
 import Retina from "../Retina/Retina";
 import QuickChannelButtonList from "../QuickChannelButtonList/QuickChannelButtonList";
+import ChannelDescription from "../ChannelDescription/ChannelDescription";
 
 class VirtualRadio extends React.Component{
   constructor(props){
@@ -18,7 +19,8 @@ class VirtualRadio extends React.Component{
         isDataLoaded: false,
         errorOnLoad: null,
         isRadioLive: false,
-        volumeValue: 0.4
+        volumeValue: 0.4,
+        isChannelStreaming: false
     };
 
     bindHandleMethods(){
@@ -32,7 +34,6 @@ class VirtualRadio extends React.Component{
     componentDidMount(){
       this.retrieveData()
     }
-
   render() {
     const { isRadioLive, data, isDataLoaded, errorOnLoad, targetFreq, volumeValue} = this.state;
     if(errorOnLoad){
@@ -62,6 +63,7 @@ class VirtualRadio extends React.Component{
               targetFreq={targetFreq}
               isRadioLive={isRadioLive}>
             </Retina>
+            {this.getChannelDescription()}
             <QuickChannelButtonList
               data={data}
               parentCallback={this.handleQuickChannelButtonClick}>
@@ -94,13 +96,37 @@ class VirtualRadio extends React.Component{
     });
   }
   handleQuickChannelButtonClick = (channelID) => {
-    console.log(this.state.data.filter(channel => channel.id === channelID));
-    console.log(channelID);
+    const channelClicked = this.state.data.filter(channel => channel.id === channelID)[0];
+    let newFreq = ((channelClicked.to_frequency+channelClicked.from_frequency)/2).toFixed(2);
     this.setState({
-      targetFreq: this.state.data.filter(channel => channel.id === channelID)[0].frequency
+      targetFreq: newFreq
     });
   }
-
+  getChannelDescription(){
+    let streamingChannel = null;
+    if(this.state.isRadioLive){
+      let isChannelStreaming = false;
+      this.state.data.forEach( channel =>{
+          if(this.state.targetFreq >=channel.from_frequency && this.state.targetFreq <=channel.to_frequency)  {
+            isChannelStreaming = true;
+            streamingChannel=channel;
+            console.log("streamingChannel:", channel.id);
+          }
+        });
+      if(isChannelStreaming){
+        return(
+          <ChannelDescription
+            channel={streamingChannel}>
+          </ChannelDescription>
+        );
+      }
+    }
+    return (
+      <ChannelDescription
+        channel={{title:"", description:"No channel streaming..."}}>
+      </ChannelDescription>
+    )
+  }
   retrieveData(){
     axios.get("https://radio.ethylomat.de/api/v1/channels/")
     .then( response =>{
