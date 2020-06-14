@@ -3,10 +3,10 @@ import axios from 'axios';
 import AudioList from "../AudioList/AudioList";
 import PowerSwitch from "../PowerSwitch/PowerSwitch";
 import Tuner from "../Tuner/Tuner";
-import VolumeController from "../VolumeController/VolumeController";
 import Retina from "../Retina/Retina";
+import VolumeController from "../VolumeController/VolumeController";
 import QuickChannelButtonList from "../QuickChannelButtonList/QuickChannelButtonList";
-import ChannelDescription from "../ChannelDescription/ChannelDescription";
+
 
 class VirtualRadio extends React.Component{
   constructor(props){
@@ -20,7 +20,8 @@ class VirtualRadio extends React.Component{
         errorOnLoad: null,
         isRadioLive: false,
         volumeValue: 0.4,
-        isChannelStreaming: false
+        isChannelStreaming: false,
+        streamingChannelID: -1
     };
 
     bindHandleMethods(){
@@ -29,13 +30,15 @@ class VirtualRadio extends React.Component{
       this.handleCallbackFromTuner = this.handleCallbackFromTuner.bind(this);
       this.changeVolumeValue = this.changeVolumeValue.bind(this);
       this.handleQuickChannelButtonClick = this.handleQuickChannelButtonClick.bind(this);
+      this.setSteamingChannelIfLive = this.setSteamingChannelIfLive.bind(this);
     }
 
     componentDidMount(){
       this.retrieveData()
     }
+
   render() {
-    const { isRadioLive, data, isDataLoaded, errorOnLoad, targetFreq, volumeValue} = this.state;
+    const { isRadioLive, data, isDataLoaded, errorOnLoad, targetFreq, volumeValue, streamingChannelID, isChannelStreaming} = this.state;
     if(errorOnLoad){
       return <div> Error: {errorOnLoad}</div>
     } else if (!isDataLoaded) {
@@ -47,9 +50,20 @@ class VirtualRadio extends React.Component{
             Virtual Radio is here.
             <Tuner
               targetFreq={targetFreq}
+              isRadioLive={isRadioLive}
+              data={data}
+              isChannelStreaming={isChannelStreaming}
+              streamingChannelID={streamingChannelID}
               parentCallback = {this.handleCallbackFromTuner}
               ></Tuner>
-            <div>targetFreq: {targetFreq} </div>
+            <Retina
+              targetFreq = {targetFreq}
+              isRadioLive = {isRadioLive}
+              data={data}
+              streamingChannelID = {streamingChannelID}
+              isChannelStreaming = {isChannelStreaming}
+              ></Retina>
+            <div>targetFrequency: {targetFreq} </div>
             <PowerSwitch
               onPowerOn={this.handleClickPowerOn}
               onPowerOff={this.handleClickPowerOff}
@@ -59,11 +73,6 @@ class VirtualRadio extends React.Component{
               parentCallback={this.changeVolumeValue}
               volumeValue={this.state.volumeValue}>
             </VolumeController>
-            <Retina
-              targetFreq={targetFreq}
-              isRadioLive={isRadioLive}>
-            </Retina>
-            {this.getChannelDescription()}
             <QuickChannelButtonList
               data={data}
               parentCallback={this.handleQuickChannelButtonClick}>
@@ -90,43 +99,42 @@ class VirtualRadio extends React.Component{
   }
 
   handleCallbackFromTuner = (freqFromTuner) => {
-    let newFreq = freqFromTuner.toFixed(2);
+    let newFreq = freqFromTuner.toFixed(3);
     this.setState({
       targetFreq: newFreq
     });
+    this.setSteamingChannelIfLive(freqFromTuner);
   }
   handleQuickChannelButtonClick = (channelID) => {
     const channelClicked = this.state.data.filter(channel => channel.id === channelID)[0];
-    let newFreq = ((channelClicked.to_frequency+channelClicked.from_frequency)/2).toFixed(2);
+    let newFreq = ((channelClicked.to_frequency+channelClicked.from_frequency)/2).toFixed(3);
     this.setState({
       targetFreq: newFreq
     });
   }
-  getChannelDescription(){
-    let streamingChannel = null;
+
+  setSteamingChannelIfLive(newFrequency){
+    let onChannelLeave = true;
     if(this.state.isRadioLive){
-      let isChannelStreaming = false;
-      this.state.data.forEach( channel =>{
-          if(this.state.targetFreq >=channel.from_frequency && this.state.targetFreq <=channel.to_frequency)  {
-            isChannelStreaming = true;
-            streamingChannel=channel;
-            console.log("streamingChannel:", channel.id);
-          }
+      this.state.data.forEach( channel => {
+        if(parseFloat(newFrequency,10) >= channel.from_frequency && parseFloat(newFrequency,10) <= channel.to_frequency)  {
+          onChannelLeave = false;
+          this.setState({
+            isChannelStreaming : true,
+            streamingChannelID : channel.id
+          });
+          console.log("streamingChannel:", channel.id);
+        }
+      });
+      if(onChannelLeave) {
+        this.setState({
+          isChannelStreaming : false,
+          streamingChannelID : -1
         });
-      if(isChannelStreaming){
-        return(
-          <ChannelDescription
-            channel={streamingChannel}>
-          </ChannelDescription>
-        );
       }
     }
-    return (
-      <ChannelDescription
-        channel={{title:"", description:"No channel streaming..."}}>
-      </ChannelDescription>
-    )
   }
+
   retrieveData(){
     axios.get("https://radio.ethylomat.de/api/v1/channels/")
     .then( response =>{
