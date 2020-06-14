@@ -3,7 +3,6 @@ import axios from 'axios';
 import AudioList from "../AudioList/AudioList";
 import PowerSwitch from "../PowerSwitch/PowerSwitch";
 import Tuner from "../Tuner/Tuner";
-import Retina from "../Retina/Retina";
 import VolumeController from "../VolumeController/VolumeController";
 import QuickChannelButtonList from "../QuickChannelButtonList/QuickChannelButtonList";
 
@@ -56,13 +55,6 @@ class VirtualRadio extends React.Component{
               streamingChannelID={streamingChannelID}
               parentCallback = {this.handleCallbackFromTuner}
               ></Tuner>
-            <Retina
-              targetFreq = {targetFreq}
-              isRadioLive = {isRadioLive}
-              data={data}
-              streamingChannelID = {streamingChannelID}
-              isChannelStreaming = {isChannelStreaming}
-              ></Retina>
             <div>targetFrequency: {targetFreq} </div>
             <PowerSwitch
               onPowerOn={this.handleClickPowerOn}
@@ -105,6 +97,7 @@ class VirtualRadio extends React.Component{
     });
     this.setSteamingChannelIfLive(freqFromTuner);
   }
+
   handleQuickChannelButtonClick = (channelID) => {
     const channelClicked = this.state.data.filter(channel => channel.id === channelID)[0];
     let newFreq = ((channelClicked.to_frequency+channelClicked.from_frequency)/2).toFixed(3);

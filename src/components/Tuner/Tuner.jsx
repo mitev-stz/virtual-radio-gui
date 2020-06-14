@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Retina from "../Retina/Retina";
 
 
 class Tuner extends React.Component {
@@ -16,11 +16,19 @@ class Tuner extends React.Component {
   }
 
   render () {
+    const{targetFreq, isRadioLive, data, streamingChannelID, isChannelStreaming} = this.props;
     return (
       <div className="container">
-        <div className="bordered">Frequency Tuner</div>
+        <div className="bordered">Frequency Tuner with targetFreq: {targetFreq}</div>
         <button className="freqIncrButton" onMouseUp={this.onIncUp} onMouseDown={this.onIncrDown}> Up</button>
         <button className="freqDecrButton" onMouseUp={this.onIncUp} onMouseDown={this.onDecrDown}> Down</button>
+          <Retina
+            targetFreq = {targetFreq}
+            isRadioLive = {isRadioLive}
+            data={data}
+            streamingChannelID = {streamingChannelID}
+            isChannelStreaming = {isChannelStreaming}
+            ></Retina>
       </div>
     );
   }
@@ -37,9 +45,10 @@ class Tuner extends React.Component {
   }
 
   updateIntervalIncr(){
-      let newFrequency = this.state.targetFreq;
+      let newFrequency = parseFloat(this.props.targetFreq);
       if( newFrequency + 0.003 <= 1) {
-        newFrequency += 0.003;
+        newFrequency = parseFloat((newFrequency+ 0.003).toFixed(3));
+
         this.setState({
           targetFreq : newFrequency
         });
@@ -48,9 +57,9 @@ class Tuner extends React.Component {
   }
 
   updateIntervalDecr(){
-    let newFrequency = this.state.targetFreq;
+    let newFrequency = parseFloat(this.state.targetFreq);
       if(newFrequency - 0.003 >= 0) {
-        newFrequency -= 0.003;
+        newFrequency = parseFloat((newFrequency - 0.003).toFixed(3));
         this.setState({
           targetFreq : newFrequency
         });
