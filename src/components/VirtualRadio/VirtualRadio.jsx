@@ -29,7 +29,6 @@ class VirtualRadio extends React.Component{
       this.handleCallbackFromTuner = this.handleCallbackFromTuner.bind(this);
       this.changeVolumeValue = this.changeVolumeValue.bind(this);
       this.handleQuickChannelButtonClick = this.handleQuickChannelButtonClick.bind(this);
-      this.setSteamingChannelIfLive = this.setSteamingChannelIfLive.bind(this);
     }
 
     componentDidMount(){
@@ -88,6 +87,7 @@ class VirtualRadio extends React.Component{
     this.setState({
       isRadioLive:state
     });
+    this.setSteamingChannelFromPowerSwitchIfLive(state);
   }
 
   handleCallbackFromTuner = (freqFromTuner) => {
@@ -95,7 +95,7 @@ class VirtualRadio extends React.Component{
     this.setState({
       targetFreq: newFreq
     });
-    this.setSteamingChannelIfLive(freqFromTuner);
+    this.setSteamingChannelFromFrequencyIfLive(freqFromTuner);
   }
 
   handleQuickChannelButtonClick = (channelID) => {
@@ -106,7 +106,30 @@ class VirtualRadio extends React.Component{
     });
   }
 
-  setSteamingChannelIfLive(newFrequency){
+  setSteamingChannelFromPowerSwitchIfLive(isPowerOn){
+    let onChannelLeave = true;
+    if(isPowerOn){
+      let frequency = parseFloat(this.state.targetFreq);
+      this.state.data.forEach( channel => {
+        if(frequency >= channel.from_frequency &&  frequency <= channel.to_frequency)  {
+          onChannelLeave = false;
+          this.setState({
+            isChannelStreaming : true,
+            streamingChannelID : channel.id
+          });
+          console.log("streamingChannel:", channel.id);
+        }
+      });
+      if(onChannelLeave) {
+        this.setState({
+          isChannelStreaming : false,
+          streamingChannelID : -1
+        });
+      }
+    }
+  }
+
+  setSteamingChannelFromFrequencyIfLive(newFrequency){
     let onChannelLeave = true;
     if(this.state.isRadioLive){
       this.state.data.forEach( channel => {
