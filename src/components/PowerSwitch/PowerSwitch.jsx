@@ -6,8 +6,8 @@ class PowerSwitch extends React.Component {
     const{onPowerOn, onPowerOff} = this.props;
       return (
           <div className="power-switch">
-            <button className={this.getBtnOnClasses()} onClick={onPowerOn}>On</button>
-            <button className="powerButton-off" onClick={onPowerOff}>Off</button>
+            <button data-testid="powerOn-button" className={this.getBtnOnClasses()} onClick={onPowerOn}>On</button>
+            <button data-testid="powerOn-button" className="powerButton-off" onClick={onPowerOff}>Off</button>
           </div>
         );
   }

@@ -38,7 +38,7 @@ class VirtualRadio extends React.Component{
   render() {
     const { isRadioLive, data, isDataLoaded, errorOnLoad, targetFreq, volumeValue, streamingChannelID, isChannelStreaming} = this.state;
     if(errorOnLoad){
-      return <div> Error: {errorOnLoad}</div>
+      return <div> Error: {errorOnLoad.message}</div>
     } else if (!isDataLoaded) {
       return <div>Loading Data... </div>
     } else {
@@ -100,10 +100,11 @@ class VirtualRadio extends React.Component{
 
   handleQuickChannelButtonClick = (channelID) => {
     const channelClicked = this.state.data.filter(channel => channel.id === channelID)[0];
-    let newFreq = ((channelClicked.to_frequency+channelClicked.from_frequency)/2).toFixed(3);
+    let newFreq = ((channelClicked.to_frequency + channelClicked.from_frequency) / 2).toFixed(3);
     this.setState({
       targetFreq: newFreq
     });
+    this.setSteamingChannelFromFrequencyIfLive(newFreq);
   }
 
   setSteamingChannelFromPowerSwitchIfLive(isPowerOn){
@@ -152,7 +153,15 @@ class VirtualRadio extends React.Component{
   }
 
   retrieveData(){
-    axios.get("https://radio.ethylomat.de/api/v1/channels/")
+    const username = 'admin';
+    const password = 'test123';
+    const token = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
+
+    axios.get("https://radio.ethylomat.de/api/v1/channels/",
+      {headers: {
+        'Authorization' : `Basic ${token}`
+        }
+      })
     .then( response =>{
       const json = response.data;
       this.setState({

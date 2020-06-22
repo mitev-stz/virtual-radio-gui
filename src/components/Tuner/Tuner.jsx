@@ -20,9 +20,10 @@ class Tuner extends React.Component {
     return (
       <div className="container">
         <div className="bordered">Frequency Tuner with targetFreq: {targetFreq}</div>
-        <button className="freqIncrButton" onMouseUp={this.onIncUp} onMouseDown={this.onIncrDown}> Up</button>
-        <button className="freqDecrButton" onMouseUp={this.onIncUp} onMouseDown={this.onDecrDown}> Down</button>
+        <button className="freqIncrButton" onMouseUp={this.onIncUp} onMouseDown={this.onIncrDown} placeholder="increment-button"> Up</button>
+        <button className="freqDecrButton" onMouseUp={this.onIncUp} onMouseDown={this.onDecrDown} placeholder="decrement-button"> Down</button>
           <Retina
+            data-testid = "retina"
             targetFreq = {targetFreq}
             isRadioLive = {isRadioLive}
             data={data}

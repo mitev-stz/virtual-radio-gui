@@ -11,7 +11,7 @@ class VolumeController extends React.Component {
    return (
      <div className="volume-controller-container container">
         <div>Volume Controller</div>
-        <input type="range" min="0" max="100" step="1" onInput={this.sendChangedVolume} onChange={this.sendChangedVolume} value={volumeValue}></input>
+        <input data-testid="volumeInput" type="range" min="0" max="100" step="1" onInput={this.sendChangedVolume} onChange={this.sendChangedVolume} value={volumeValue}></input>
         {volumeValue}%
      </div>
    );
