@@ -1,19 +1,21 @@
 import React from 'react';
-import "./assets/styles/powerSwitch.css"
+import "./assets/styles/powerSwitch.css";
 
 class PowerSwitch extends React.Component {
   render () {
-    const{onPowerOn, onPowerOff} = this.props;
+    const{handleToggleSwitchAction} = this.props;
       return (
-          <div className="power-switch">
-            <button data-testid="powerOn-button" className={this.getBtnOnClasses()} onClick={onPowerOn}>On</button>
-            <button data-testid="powerOn-button" className="powerButton-off" onClick={onPowerOff}>Off</button>
-          </div>
+          <span className="power-switch">
+              <label className="switch">
+                <input type="checkbox"onClick = {handleToggleSwitchAction}></input>
+                <span className="slider round"></span>
+              </label>
+          </span>
         );
   }
   getBtnOnClasses(){
-    let classes = "powerButton-on ";
-    classes+= this.props.isRadioLive? "powerButton-on-active" : "";
+    let classes = "btn powerButton-on ";
+    classes+= this.props.isRadioLive? " btn powerButton-on-active" : "";
     return classes;
   }
 }

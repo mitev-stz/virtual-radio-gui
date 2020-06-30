@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import "./assets/styles/volumeController.css";
 
 class VolumeController extends React.Component {
   constructor(props){
@@ -9,11 +10,9 @@ class VolumeController extends React.Component {
     let val = this.props.volumeValue*100;
     const volumeValue = val.toFixed(0);
    return (
-     <div className="volume-controller-container container">
-        <div>Volume Controller</div>
+     <span className="volume-controller">
         <input data-testid="volumeInput" type="range" min="0" max="100" step="1" onInput={this.sendChangedVolume} onChange={this.sendChangedVolume} value={volumeValue}></input>
-        {volumeValue}%
-     </div>
+     </span>
    );
   }
   sendChangedVolume(event){

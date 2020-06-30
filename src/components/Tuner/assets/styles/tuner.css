@@ -1,0 +1,14 @@
+.tuner-container{
+  float: left;
+}
+.tuner-container{
+  height: 70%;
+  position: absolute;
+  left: 150px;
+  top:100px;
+  width: 70%;
+}
+.tunerButtons-container{
+  position: absolute;
+  right: 50px;
+}

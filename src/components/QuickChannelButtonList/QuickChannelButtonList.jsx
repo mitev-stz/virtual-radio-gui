@@ -1,5 +1,7 @@
 import React from 'react'
 import QuickChannelButton from "../QuickChannelButton/QuickChannelButton";
+import "./assets/styles/quickChannelButtonList.css";
+
 class QuickChannelButtonList extends React.Component {
   constructor(props){
     super(props);

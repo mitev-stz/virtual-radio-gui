@@ -1,5 +1,6 @@
 import React from 'react';
 import Retina from "../Retina/Retina";
+import "./assets/styles/tuner.css";
 
 
 class Tuner extends React.Component {
@@ -18,18 +19,19 @@ class Tuner extends React.Component {
   render () {
     const{targetFreq, isRadioLive, data, streamingChannelID, isChannelStreaming} = this.props;
     return (
-      <div className="container">
-        <div className="bordered">Frequency Tuner with targetFreq: {targetFreq}</div>
-        <button className="freqIncrButton" onMouseUp={this.onIncUp} onMouseDown={this.onIncrDown} placeholder="increment-button"> Up</button>
-        <button className="freqDecrButton" onMouseUp={this.onIncUp} onMouseDown={this.onDecrDown} placeholder="decrement-button"> Down</button>
-          <Retina
-            data-testid = "retina"
-            targetFreq = {targetFreq}
-            isRadioLive = {isRadioLive}
-            data={data}
-            streamingChannelID = {streamingChannelID}
-            isChannelStreaming = {isChannelStreaming}
-            ></Retina>
+      <div className="tuner-container">
+            <Retina
+              data-testid = "retina"
+              targetFreq = {targetFreq}
+              isRadioLive = {isRadioLive}
+              data={data}
+              streamingChannelID = {streamingChannelID}
+              isChannelStreaming = {isChannelStreaming}
+              ></Retina>
+            <div className="tunerButtons-container">
+            <button className="freqIncrButton" onMouseUp={this.onIncUp} onMouseDown={this.onIncrDown} placeholder="increment-button"> Up</button>
+            <button className="freqDecrButton" onMouseUp={this.onIncUp} onMouseDown={this.onDecrDown} placeholder="decrement-button"> Down</button>
+          </div>
       </div>
     );
   }

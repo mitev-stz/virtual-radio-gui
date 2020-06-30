@@ -5,17 +5,19 @@ import "./assets/styles/retina.css";
 class Retina extends React.Component {
 
   render() {
-    const {targetFreq, data, isChannelStreaming, isRadioLive, streamingChannelID} = this.props;
+    const {data, isChannelStreaming, isRadioLive, streamingChannelID} = this.props;
     return (
-    <div className="retina-container container">
-      <div className={this.getRetinaLiveClasses()}>
+    <div className="retina-container">
+      <span className={this.getRetinaLiveClasses()}>
         Live
-      </div>
-      <div className="retina-stereo">
+      </span>
+      <span className="retina-stereo">
         Stereo
-      </div>
+      </span>
       <div className="retina-frequency">
-        Retina Frequency: Current frequency is {targetFreq}.
+        <div className="progress">
+          <div className="frequency-pointer"></div>
+        </div>
         <div className="Channel Description">
           hello
           <ChannelDescription

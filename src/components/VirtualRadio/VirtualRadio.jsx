@@ -5,7 +5,7 @@ import PowerSwitch from "../PowerSwitch/PowerSwitch";
 import Tuner from "../Tuner/Tuner";
 import VolumeController from "../VolumeController/VolumeController";
 import QuickChannelButtonList from "../QuickChannelButtonList/QuickChannelButtonList";
-
+import "./assets/styles/virtualRadio.css";
 
 class VirtualRadio extends React.Component{
   constructor(props){
@@ -24,8 +24,7 @@ class VirtualRadio extends React.Component{
     };
 
     bindHandleMethods(){
-      this.handleClickPowerOn = this.handleClickOnPowerBtn.bind(this, true);
-      this.handleClickPowerOff = this.handleClickOnPowerBtn.bind(this, false);
+      this.handleToggleSwitchAction = this.handleToggleSwitchAction.bind(this);
       this.handleCallbackFromTuner = this.handleCallbackFromTuner.bind(this);
       this.changeVolumeValue = this.changeVolumeValue.bind(this);
       this.handleQuickChannelButtonClick = this.handleQuickChannelButtonClick.bind(this);
@@ -36,7 +35,7 @@ class VirtualRadio extends React.Component{
     }
 
   render() {
-    const { isRadioLive, data, isDataLoaded, errorOnLoad, targetFreq, volumeValue, streamingChannelID, isChannelStreaming} = this.state;
+    const { isRadioLive, data, isDataLoaded, errorOnLoad, targetFreq, streamingChannelID, isChannelStreaming} = this.state;
     if(errorOnLoad){
       return <div> Error: {errorOnLoad.message}</div>
     } else if (!isDataLoaded) {
@@ -44,32 +43,32 @@ class VirtualRadio extends React.Component{
     } else {
       return (
         <div className="centered-container virtRadio">
-          <div className="centered-context">
-            Virtual Radio is here.
-            <Tuner
-              targetFreq={targetFreq}
-              isRadioLive={isRadioLive}
-              data={data}
-              isChannelStreaming={isChannelStreaming}
-              streamingChannelID={streamingChannelID}
-              parentCallback = {this.handleCallbackFromTuner}
-              ></Tuner>
-            <div>targetFrequency: {targetFreq} </div>
-            <PowerSwitch
-              onPowerOn={this.handleClickPowerOn}
-              onPowerOff={this.handleClickPowerOff}
-              isRadioLive={isRadioLive}
-              ></PowerSwitch>
-            <VolumeController
-              parentCallback={this.changeVolumeValue}
-              volumeValue={this.state.volumeValue}>
-            </VolumeController>
-            <QuickChannelButtonList
-              data={data}
-              parentCallback={this.handleQuickChannelButtonClick}>
-            </QuickChannelButtonList>
-            <div className="container"> Volume In Radio Component: {volumeValue}</div>
+          <div className="radio-inner-case">
+            <div className="radio-front-case">
+              <div className="radio-panel">
+                  <PowerSwitch
+                    handleToggleSwitchAction={this.handleToggleSwitchAction}
+                    isRadioLive={isRadioLive}
+                  ></PowerSwitch>
+                  <Tuner
+                    targetFreq={targetFreq}
+                    isRadioLive={isRadioLive}
+                    data={data}
+                    isChannelStreaming={isChannelStreaming}
+                    streamingChannelID={streamingChannelID}
+                    parentCallback = {this.handleCallbackFromTuner}
+                    ></Tuner>
+                  <VolumeController
+                    parentCallback={this.changeVolumeValue}
+                    volumeValue={this.state.volumeValue}>
+                  </VolumeController>
           </div>
+        </div>
+          <QuickChannelButtonList
+            data={data}
+              parentCallback={this.handleQuickChannelButtonClick}>
+          </QuickChannelButtonList>
+        </div>
           <AudioList audios={data}> </AudioList>
         </div>
       );
@@ -83,11 +82,13 @@ class VirtualRadio extends React.Component{
     });
   }
 
-  handleClickOnPowerBtn(state){
-    this.setState({
-      isRadioLive:state
-    });
-    this.setSteamingChannelFromPowerSwitchIfLive(state);
+  handleToggleSwitchAction(){
+    this.setState((prevstate) =>(
+      {
+        isRadioLive: !prevstate.isRadioLive
+      }
+    ));
+    this.setSteamingChannelFromPowerSwitchIfLive(!this.state.isRadioLive);
   }
 
   handleCallbackFromTuner = (freqFromTuner) => {
@@ -159,7 +160,8 @@ class VirtualRadio extends React.Component{
 
     axios.get("https://radio.ethylomat.de/api/v1/channels/",
       {headers: {
-        'Authorization' : `Basic ${token}`
+        'Authorization' : `Basic ${token}`,
+        "Content-Type": "application/json"
         }
       })
     .then( response =>{

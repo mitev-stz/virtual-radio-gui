@@ -1,13 +1,14 @@
 import React from 'react'
+import "./assets/styles/quickChannelButton.css";
 
 const QuickChannelButton = (props) => {
   const {channelID, parentCallback} = props;
   return(
-    <button className="QuickChannelButton" onClick={() => {
+    <div className="btn-block quickChannelBtn" onClick={() => {
       parentCallback(channelID);
       }}>
       channelID:{channelID}
-    </button>
+    </div>
   );
 }
 

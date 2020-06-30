@@ -1,0 +1,11 @@
+.quickChannelBtn{
+  border: 2px solid #4c3f29f0;
+  background-color: #947030f0;
+  max-width: 8%;
+  float: left;
+  margin-left: 0.2em;
+  margin-right: 0.2em;
+}
+.quickChannelBtn:hover{
+  background-color: #e6b969f0;
+}
