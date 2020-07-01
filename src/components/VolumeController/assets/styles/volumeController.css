@@ -1,5 +1,8 @@
 .volume-controller{
   position: absolute;
-  right: 25px;
-  bottom: 70px;
+  right: 2%;
+  bottom: 5%;
+}
+input[type=range]:focus{
+  cursor: pointer;
 }

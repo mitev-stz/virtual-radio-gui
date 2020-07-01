@@ -96,12 +96,20 @@ class VirtualRadio extends React.Component{
     this.setState({
       targetFreq: newFreq
     });
+
+    var pointer = document.getElementsByClassName('frequency-pointer')[0];
+    pointer.style.left =  this.state.targetFreq*100+"%";
+
     this.setSteamingChannelFromFrequencyIfLive(freqFromTuner);
   }
 
   handleQuickChannelButtonClick = (channelID) => {
     const channelClicked = this.state.data.filter(channel => channel.id === channelID)[0];
     let newFreq = ((channelClicked.to_frequency + channelClicked.from_frequency) / 2).toFixed(3);
+
+    var pointer = document.getElementsByClassName('frequency-pointer')[0];
+    pointer.style.left =  newFreq*100+"%";
+
     this.setState({
       targetFreq: newFreq
     });

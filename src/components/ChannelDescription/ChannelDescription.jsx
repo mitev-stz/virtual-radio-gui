@@ -1,15 +1,17 @@
-import React from 'react'
+import React from 'react';
+import "./assets/styles/channelDescription.css";
+
 
 const ChannelDescription = (props) => {
     let title = "No Title";
     let description = "Description: No streaming Channel at this frequency!";
 
     if(props.isRadioLive && props.isChannelStreaming){
-      title = "Title: " + props.channel.title;
-      description = "Description: " + props.channel.description;
+      title = props.channel.title;
+      description = props.channel.description;
     }
       return (
-        <div className="container channel-info-container">
+        <div className="channel-info-container">
           <div className="channel-title">
             {title}
           </div>

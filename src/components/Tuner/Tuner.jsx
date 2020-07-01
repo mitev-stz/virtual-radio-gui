@@ -29,19 +29,23 @@ class Tuner extends React.Component {
               isChannelStreaming = {isChannelStreaming}
               ></Retina>
             <div className="tunerButtons-container">
-            <button className="freqIncrButton" onMouseUp={this.onIncUp} onMouseDown={this.onIncrDown} placeholder="increment-button"> Up</button>
-            <button className="freqDecrButton" onMouseUp={this.onIncUp} onMouseDown={this.onDecrDown} placeholder="decrement-button"> Down</button>
+            <div className="freqDecrButton" onMouseUp={this.onIncUp} onMouseDown={this.onDecrDown} placeholder="decrement-button"> <span className="arrow-left"></span></div>
+            <div className="freqIncrButton" onMouseUp={this.onIncUp} onMouseDown={this.onIncrDown} placeholder="increment-button"> <span className="arrow-right"></span></div>
           </div>
       </div>
     );
   }
 
   onDecrDown(){
+    var decrBtn = document.getElementsByClassName('freqDecrButton')[0];
+    decrBtn.classList.add('btnClicked');
     this.intervalId = window.setInterval(() => {
       this.updateIntervalDecr();
     },100);
   }
   onIncrDown(){
+    var incrBtn = document.getElementsByClassName('freqIncrButton')[0];
+    incrBtn.classList.add('btnClicked');
     this.intervalId = window.setInterval(() => {
       this.updateIntervalIncr();
     },100);
@@ -71,6 +75,8 @@ class Tuner extends React.Component {
   }
 
   onIncUp(){
+    document.getElementsByClassName('freqDecrButton')[0].classList.remove('btnClicked');
+    document.getElementsByClassName('freqIncrButton')[0].classList.remove('btnClicked');
     clearInterval(this.intervalId);
   }
 }
