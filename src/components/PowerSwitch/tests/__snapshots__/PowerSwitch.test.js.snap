@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`updates internal state on buttons clicked 1`] = `
+<span
+  className="power-switch"
+  placeholder="power-switch"
+>
+  <label
+    className="switch"
+  >
+    <input
+      data-testid="checkbox"
+      type="checkbox"
+    />
+    <span
+      className="slider round"
+    />
+  </label>
+</span>
+`;
+
+exports[`updates internal state on buttons clicked 2`] = `
+<span
+  className="power-switch"
+  placeholder="power-switch"
+>
+  <label
+    className="switch"
+  >
+    <input
+      data-testid="checkbox"
+      type="checkbox"
+    />
+    <span
+      className="slider round"
+    />
+  </label>
+</span>
+`;
+
+exports[`updates internal state on buttons clicked 3`] = `
+<span
+  className="power-switch"
+  placeholder="power-switch"
+>
+  <label
+    className="switch"
+  >
+    <input
+      data-testid="checkbox"
+      type="checkbox"
+    />
+    <span
+      className="slider round"
+    />
+  </label>
+</span>
+`;
