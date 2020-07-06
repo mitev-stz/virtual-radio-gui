@@ -243,7 +243,6 @@ class VirtualRadio extends React.Component{
           source.buffer = audioBuffer;
           source.connect(audioContext.destination);
           // source.start();
-          console.log(source);
           this.audioFiles[0] = {
             audioId: 0,
             audioContext: audioContext,
