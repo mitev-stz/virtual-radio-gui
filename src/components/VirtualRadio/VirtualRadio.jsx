@@ -254,7 +254,6 @@ class VirtualRadio extends React.Component{
   }
 
   getAudioContext(){
-    AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioContent = new AudioContext();
     return audioContent;
   };
