@@ -6,7 +6,6 @@ class Retina extends React.Component {
 
   render() {
     const {data, isChannelStreaming, isRadioLive, streamingChannelID} = this.props;
-    console.log("retina data:", data);
     return (
     <div className="retina-container">
       <span className={this.getRetinaLiveClasses()}>

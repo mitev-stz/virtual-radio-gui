@@ -11,6 +11,7 @@ class VirtualRadio extends React.Component{
   constructor(props){
     super(props);
     this.bindHandleMethods();
+    this.audioFiles = [];
   }
     state = {
         data:[],
@@ -30,8 +31,8 @@ class VirtualRadio extends React.Component{
       this.handleQuickChannelButtonClick = this.handleQuickChannelButtonClick.bind(this);
     }
 
-    componentDidMount(){
-      this.retrieveData()
+    async componentDidMount(){
+      this.retrieveDataAndLoadAudioFiles();
     }
 
   render() {
@@ -69,7 +70,7 @@ class VirtualRadio extends React.Component{
               parentCallback={this.handleQuickChannelButtonClick}>
           </QuickChannelButtonList>
         </div>
-          <AudioList audios={data}> </AudioList>
+          <AudioList ref={this.audioList} audios={data}> </AudioList>
         </div>
       );
 
@@ -88,7 +89,7 @@ class VirtualRadio extends React.Component{
         isRadioLive: !prevstate.isRadioLive
       }
     ));
-    this.setSteamingChannelFromPowerSwitchIfLive(!this.state.isRadioLive);
+    this.setSteamingChannelFromPowerSwitch(!this.state.isRadioLive);
   }
 
   handleCallbackFromTuner = (freqFromTuner) => {
@@ -100,7 +101,7 @@ class VirtualRadio extends React.Component{
     var pointer = document.getElementsByClassName('frequency-pointer')[0];
     pointer.style.left =  this.state.targetFreq*100+"%";
 
-    this.setSteamingChannelFromFrequencyIfLive(freqFromTuner);
+    this.setSteamingChannelFromFrequency(freqFromTuner);
   }
 
   handleQuickChannelButtonClick = (channelID) => {
@@ -113,46 +114,60 @@ class VirtualRadio extends React.Component{
     this.setState({
       targetFreq: newFreq
     });
-    this.setSteamingChannelFromFrequencyIfLive(newFreq);
+    this.setSteamingChannelFromFrequency(newFreq);
   }
 
-  setSteamingChannelFromPowerSwitchIfLive(isPowerOn){
+  setSteamingChannelFromPowerSwitch(isPowerOn){
     let onChannelLeave = true;
     if(isPowerOn){
       let frequency = parseFloat(this.state.targetFreq);
       this.state.data.forEach( channel => {
         if(frequency >= channel.from_frequency &&  frequency <= channel.to_frequency)  {
           onChannelLeave = false;
+          if(!this.state.isChannelStreaming){
+            this.startPlayingAudio(channel.id);
+          }
           this.setState({
             isChannelStreaming : true,
             streamingChannelID : channel.id
           });
-          console.log("streamingChannel:", channel.id);
         }
       });
       if(onChannelLeave) {
+        if(this.state.streamingChannelID !==-1){
+          this.stopPlayingAudio(this.state.streamingChannelID);
+        }
         this.setState({
           isChannelStreaming : false,
           streamingChannelID : -1
         });
       }
+    } else {
+      if(this.state.streamingChannelID !==-1){
+        this.stopPlayingAudio(this.state.streamingChannelID);
+      }
     }
   }
 
-  setSteamingChannelFromFrequencyIfLive(newFrequency){
+  setSteamingChannelFromFrequency(newFrequency){
     let onChannelLeave = true;
     if(this.state.isRadioLive){
       this.state.data.forEach( channel => {
         if(parseFloat(newFrequency,10) >= channel.from_frequency && parseFloat(newFrequency,10) <= channel.to_frequency)  {
           onChannelLeave = false;
+          if(!this.state.isChannelStreaming){
+            this.startPlayingAudio(channel.id);
+          }
           this.setState({
             isChannelStreaming : true,
             streamingChannelID : channel.id
           });
-          console.log("streamingChannel:", channel.id);
         }
       });
       if(onChannelLeave) {
+        if(this.state.streamingChannelID!==-1){
+        this.stopPlayingAudio(this.state.streamingChannelID);
+        }
         this.setState({
           isChannelStreaming : false,
           streamingChannelID : -1
@@ -161,19 +176,42 @@ class VirtualRadio extends React.Component{
     }
   }
 
-  retrieveData(){
+  startPlayingAudio(channelID){
+    this.audioFiles[0].source.start();
+    // for (var i = 0; i < this.audioFiles.length; i++) {
+    //     var audio = this.audioFiles[i];
+    //     if(audio.audioId===channelID){
+    //       audio.source.start();
+    //     }
+    // }
+  }
+
+  stopPlayingAudio(channelID){
+    this.audioFiles[0].source.stop();
+
+    // for (var i = 0; i < this.audioFiles.length; i++) {
+    //     var audio = this.audioFiles[i];
+    //     if(audio.audioId===channelID){
+    //       audio.source.stop();
+    //     }
+    // }
+  }
+
+  retrieveDataAndLoadAudioFiles(){
     const username = 'admin';
     const password = 'test123';
     const token = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
 
-    axios.get("https://radio.ethylomat.de/api/v1/channels/",
-      {headers: {
-        'Authorization' : `Basic ${token}`,
-        "Content-Type": "application/json"
-        }
-      })
+    axios.get("https://radio.ethylomat.de/api/v1/channels/"
+      // ,{headers: {
+      //   'Authorization' : `Basic ${token}`,
+      //   "Content-Type": "application/json"
+      //   }
+      // }
+    )
     .then( response =>{
       const json = response.data;
+      this.loadAudioFiles(json, token);
       this.setState({
         data: json,
         isDataLoaded: true
@@ -186,6 +224,41 @@ class VirtualRadio extends React.Component{
       });
     });
   }
+  async loadAudioFiles(data, token){
+    // for (var i = 0; i < data.length; i++) {
+    //     var audio = data[i];
+    //     const url = audio.files[0].media_file;
+          const response = await axios.get("https://radio.ethylomat.de/media/Zuse.mp3",{
+              responseType: 'arraybuffer'
+          });
+        // const response = await axios.get(url,{
+        //   responseType: 'arraybuffer'
+        //   // ,headers: {
+        //   //   'Authorization' : `Basic ${token}`,
+        //   //   }
+        //   });
+          const audioContext = this.getAudioContext();
+          const audioBuffer = await audioContext.decodeAudioData(response.data);
+          const source = audioContext.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(audioContext.destination);
+          // source.start();
+          console.log(source);
+          this.audioFiles[0] = {
+            audioId: 0,
+            audioContext: audioContext,
+            audioBuffer:audioBuffer,
+            source:source,
+          };
+    // }
+  }
+
+  getAudioContext(){
+    AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioContent = new AudioContext();
+    return audioContent;
+  };
+
 }
 
 export default VirtualRadio;
