@@ -81,6 +81,7 @@ class VirtualRadio extends React.Component{
     this.setState({
       volumeValue: volumeControllerData
     });
+    this.applyVolumeChangeOnAudio(volumeControllerData);
   }
 
   handleToggleSwitchAction(){
@@ -118,83 +119,80 @@ class VirtualRadio extends React.Component{
   }
 
   setSteamingChannelFromPowerSwitch(isPowerOn){
-    let onChannelLeave = true;
     if(isPowerOn){
       let frequency = parseFloat(this.state.targetFreq);
       this.state.data.forEach( channel => {
-        if(frequency >= channel.from_frequency &&  frequency <= channel.to_frequency)  {
-          onChannelLeave = false;
-          if(!this.state.isChannelStreaming){
-            this.startPlayingAudio(channel.id);
-          }
-          this.setState({
-            isChannelStreaming : true,
-            streamingChannelID : channel.id
-          });
+        if(frequency >= channel.from_frequency &&  frequency <= channel.to_frequency){
+            this.playAudio(channel.id);
+            this.setState({
+              isChannelStreaming : true,
+              streamingChannelID : channel.id
+            });
         }
       });
-      if(onChannelLeave) {
-        if(this.state.streamingChannelID !==-1){
-          this.stopPlayingAudio(this.state.streamingChannelID);
-        }
-        this.setState({
-          isChannelStreaming : false,
-          streamingChannelID : -1
-        });
-      }
     } else {
-      if(this.state.streamingChannelID !==-1){
-        this.stopPlayingAudio(this.state.streamingChannelID);
-      }
+      this.deactivateAudioStream();
     }
   }
 
   setSteamingChannelFromFrequency(newFrequency){
-    let onChannelLeave = true;
+    let isStreamingNotActive = true;
     if(this.state.isRadioLive){
       this.state.data.forEach( channel => {
-        if(parseFloat(newFrequency,10) >= channel.from_frequency && parseFloat(newFrequency,10) <= channel.to_frequency)  {
-          onChannelLeave = false;
+        if(parseFloat(newFrequency,10) >= channel.from_frequency && parseFloat(newFrequency,10) <= channel.to_frequency){
           if(!this.state.isChannelStreaming){
-            this.startPlayingAudio(channel.id);
+            this.playAudio(channel.id);
+            this.setState({
+              isChannelStreaming : true,
+              streamingChannelID : channel.id
+            });
           }
-          this.setState({
-            isChannelStreaming : true,
-            streamingChannelID : channel.id
-          });
+          isStreamingNotActive = false;
         }
       });
-      if(onChannelLeave) {
-        if(this.state.streamingChannelID!==-1){
-        this.stopPlayingAudio(this.state.streamingChannelID);
-        }
-        this.setState({
-          isChannelStreaming : false,
-          streamingChannelID : -1
-        });
+      if(isStreamingNotActive) {
+        this.deactivateAudioStream();
       }
     }
   }
 
-  startPlayingAudio(channelID){
-    this.audioFiles[0].source.start();
-    // for (var i = 0; i < this.audioFiles.length; i++) {
-    //     var audio = this.audioFiles[i];
-    //     if(audio.audioId===channelID){
-    //       audio.source.start();
-    //     }
-    // }
+  deactivateAudioStream = () => {
+    if(this.state.streamingChannelID!==-1){
+    this.stopPlayingAudio(this.state.streamingChannelID);
+    }
+    this.setState({
+      isChannelStreaming : false,
+      streamingChannelID : -1
+    });
+  }
+
+  applyVolumeChangeOnAudio = (level) => {
+    this.audioFiles[0].gainNode.gain.value = level;
+    console.log("value", this.audioFiles[0].gainNode.gain.value);
+    console.log(this.audioFiles[0].audioContext);
+    // this.audioFiles[0].gainNode.gain.setValueAtTime(level, this.audioFiles[0].audioContext.currentTime);
+  };
+
+
+  playAudio(channelID){
+    const { source, audioBuffer, audioContext, pausedAt, hasBeenPaused } = this.audioFiles[0];
+    if(hasBeenPaused){
+      var source2 = audioContext.createBufferSource();
+      source2.connect(audioContext.destination);
+      source2.buffer = audioBuffer;
+      this.audioFiles[0].source = source2;
+      this.audioFiles[0].startedAt = Date.now() - pausedAt;
+      source2.start(0, pausedAt/1000);
+    } else {
+      this.audioFiles[0].startedAt = Date.now();
+      source.start(0);
+    }
   }
 
   stopPlayingAudio(channelID){
     this.audioFiles[0].source.stop();
-
-    // for (var i = 0; i < this.audioFiles.length; i++) {
-    //     var audio = this.audioFiles[i];
-    //     if(audio.audioId===channelID){
-    //       audio.source.stop();
-    //     }
-    // }
+    this.audioFiles[0].pausedAt = Date.now() - this.audioFiles[0].startedAt;
+    this.audioFiles[0].hasBeenPaused = true;
   }
 
   retrieveDataAndLoadAudioFiles(){
@@ -214,47 +212,48 @@ class VirtualRadio extends React.Component{
       this.loadAudioFiles(json, token);
       this.setState({
         data: json,
-        isDataLoaded: true
       });
     })
     .catch(err =>{
       this.setState({
-        isDataLoaded: true,
         errorOnLoad: err
       });
     });
   }
+
   async loadAudioFiles(data, token){
-    // for (var i = 0; i < data.length; i++) {
-    //     var audio = data[i];
-    //     const url = audio.files[0].media_file;
           const response = await axios.get("https://radio.ethylomat.de/media/Zuse.mp3",{
               responseType: 'arraybuffer'
           });
-        // const response = await axios.get(url,{
-        //   responseType: 'arraybuffer'
-        //   // ,headers: {
-        //   //   'Authorization' : `Basic ${token}`,
-        //   //   }
-        //   });
           const audioContext = this.getAudioContext();
           const audioBuffer = await audioContext.decodeAudioData(response.data);
           const source = audioContext.createBufferSource();
+          const gainNode = audioContext.createGain();
           source.buffer = audioBuffer;
-          source.connect(audioContext.destination);
-          // source.start();
+
           this.audioFiles[0] = {
             audioId: 0,
             audioContext: audioContext,
             audioBuffer:audioBuffer,
             source:source,
+            gainNode: gainNode,
+            startedAt: null,
+            pausedAt: null,
+            hasBeenPaused: false
           };
-    // }
+
+          this.audioFiles[0].source.connect(this.audioFiles[0].audioContext.destination);
+          this.audioFiles[0].source.connect(this.audioFiles[0].gainNode);
+          this.audioFiles[0].gainNode.connect(this.audioFiles[0].audioContext.destination);
+
+          this.setState({
+            isDataLoaded: true
+          });
   }
 
   getAudioContext(){
-    const audioContent = new AudioContext();
-    return audioContent;
+    const audioContext = new AudioContext();
+    return audioContext;
   };
 
 }
