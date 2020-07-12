@@ -167,18 +167,15 @@ class VirtualRadio extends React.Component{
   }
 
   applyVolumeChangeOnAudio = (level) => {
-    this.audioFiles[0].gainNode.gain.value = level;
-    console.log("value", this.audioFiles[0].gainNode.gain.value);
-    console.log(this.audioFiles[0].audioContext);
-    // this.audioFiles[0].gainNode.gain.setValueAtTime(level, this.audioFiles[0].audioContext.currentTime);
+    this.audioFiles[0].gainNode.gain.value = level * level;
   };
 
 
   playAudio(channelID){
-    const { source, audioBuffer, audioContext, pausedAt, hasBeenPaused } = this.audioFiles[0];
+    const { source, audioBuffer, audioContext, pausedAt, hasBeenPaused, gainNode} = this.audioFiles[0];
     if(hasBeenPaused){
       var source2 = audioContext.createBufferSource();
-      source2.connect(audioContext.destination);
+      source2.connect(gainNode);
       source2.buffer = audioBuffer;
       this.audioFiles[0].source = source2;
       this.audioFiles[0].startedAt = Date.now() - pausedAt;
@@ -230,7 +227,6 @@ class VirtualRadio extends React.Component{
           const source = audioContext.createBufferSource();
           const gainNode = audioContext.createGain();
           source.buffer = audioBuffer;
-
           this.audioFiles[0] = {
             audioId: 0,
             audioContext: audioContext,
@@ -239,13 +235,11 @@ class VirtualRadio extends React.Component{
             gainNode: gainNode,
             startedAt: null,
             pausedAt: null,
-            hasBeenPaused: false
+            hasBeenPaused: false,
           };
-
-          this.audioFiles[0].source.connect(this.audioFiles[0].audioContext.destination);
+          
           this.audioFiles[0].source.connect(this.audioFiles[0].gainNode);
           this.audioFiles[0].gainNode.connect(this.audioFiles[0].audioContext.destination);
-
           this.setState({
             isDataLoaded: true
           });
