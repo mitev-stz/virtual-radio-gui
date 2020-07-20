@@ -1,6 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import AudioList from "../AudioList/AudioList";
 import PowerSwitch from "../PowerSwitch/PowerSwitch";
 import Tuner from "../Tuner/Tuner";
 import VolumeController from "../VolumeController/VolumeController";
@@ -74,7 +73,6 @@ class VirtualRadio extends React.Component{
               parentCallback={this.handleQuickChannelButtonClick}>
           </QuickChannelButtonList>
         </div>
-          <AudioList ref={this.audioList} audios={data}> </AudioList>
         </div>
       );
 
