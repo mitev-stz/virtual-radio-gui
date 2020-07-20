@@ -293,29 +293,28 @@ class VirtualRadio extends React.Component{
   }
 
   generateBrownNoise(context){
-  var bufferSize = 2 * context.sampleRate;
-  var brownBuffer = context.createBuffer(
-    1,
-    bufferSize,
-    context.sampleRate
-  );
-  var noiseData = brownBuffer.getChannelData(0);
-  var lastOut = 0.0;
-  for (var i = 0; i < bufferSize; i++) {
-    var white = Math.random() * 2 - 1;
-    noiseData[i] = (lastOut + 0.02 * white) / 1.02;
-    lastOut = noiseData[i];
-    noiseData[i] *= 3.5;
+    var bufferSize = 2 * context.sampleRate;
+    var brownBuffer = context.createBuffer(
+      1,
+      bufferSize,
+      context.sampleRate
+    );
+    var noiseData = brownBuffer.getChannelData(0);
+    var lastOut = 0.0;
+    for (var i = 0; i < bufferSize; i++) {
+      var white = Math.random() * 2 - 1;
+      noiseData[i] = (lastOut + 0.02 * white) / 1.02;
+      lastOut = noiseData[i];
+      noiseData[i] *= 3.5;
+    }
+    return brownBuffer;
   }
-  return brownBuffer;
-}
-
 
   getAudioContext(){
-    const audioContext = new AudioContext();
-    return audioContext;
-  };
+      const audioContext = new AudioContext();
+      return audioContext;
+    };
 
-}
+  }
 
 export default VirtualRadio;
