@@ -12,6 +12,10 @@ class VirtualRadio extends React.Component{
     super(props);
     this.bindHandleMethods();
     this.audioFiles = [];
+    this.audioContext = this.getAudioContext();
+    this.gainNode = this.audioContext.createGain();
+    this.noiseBuffer = this.generateBrownNoise(this.audioContext);
+    this.isNoiseRunning = false;
   }
     state = {
         data:[],
@@ -121,8 +125,10 @@ class VirtualRadio extends React.Component{
   setSteamingChannelFromPowerSwitch(isPowerOn){
     if(isPowerOn){
       let frequency = parseFloat(this.state.targetFreq);
+      let isChannelTargeted = false;
       this.state.data.forEach( channel => {
         if(frequency >= channel.from_frequency &&  frequency <= channel.to_frequency){
+          isChannelTargeted = true;
             this.playAudio(channel.id);
             this.setState({
               isChannelStreaming : true,
@@ -130,28 +136,34 @@ class VirtualRadio extends React.Component{
             });
         }
       });
+      if(!isChannelTargeted){
+        this.playNoise();
+      }
     } else {
+      this.stopNoise();
       this.deactivateAudioStream();
     }
   }
 
   setSteamingChannelFromFrequency(newFrequency){
-    let isStreamingNotActive = true;
+    let isStreamingActive = false;
     if(this.state.isRadioLive){
       this.state.data.forEach( channel => {
         if(parseFloat(newFrequency,10) >= channel.from_frequency && parseFloat(newFrequency,10) <= channel.to_frequency){
           if(!this.state.isChannelStreaming){
+            this.stopNoise();
             this.playAudio(channel.id);
             this.setState({
               isChannelStreaming : true,
               streamingChannelID : channel.id
             });
           }
-          isStreamingNotActive = false;
+          isStreamingActive = true;
         }
       });
-      if(isStreamingNotActive) {
+      if(!isStreamingActive) {
         this.deactivateAudioStream();
+        this.playNoise();
       }
     }
   }
@@ -167,29 +179,42 @@ class VirtualRadio extends React.Component{
   }
 
   applyVolumeChangeOnAudio = (level) => {
-    this.audioFiles[0].gainNode.gain.value = level * level;
+    this.gainNode.gain.value = level * level;
+
   };
 
 
   playAudio(channelID){
-    const { source, audioBuffer, audioContext, pausedAt, hasBeenPaused, gainNode} = this.audioFiles[0];
-    if(hasBeenPaused){
-      var source2 = audioContext.createBufferSource();
-      source2.connect(gainNode);
+    let i = this.getAudioFilesID(channelID);
+    const { source, audioBuffer, pausedAt, pausedRecently} = this.audioFiles[i];
+    if(pausedRecently){
+      var source2 = this.audioContext.createBufferSource();
+      source2.connect(this.gainNode);
       source2.buffer = audioBuffer;
-      this.audioFiles[0].source = source2;
-      this.audioFiles[0].startedAt = Date.now() - pausedAt;
+      this.audioFiles[i].source = source2;
+      this.audioFiles[i].startedAt = Date.now() - pausedAt;
       source2.start(0, pausedAt/1000);
     } else {
-      this.audioFiles[0].startedAt = Date.now();
+      this.audioFiles[i].startedAt = Date.now();
       source.start(0);
     }
   }
 
   stopPlayingAudio(channelID){
-    this.audioFiles[0].source.stop();
-    this.audioFiles[0].pausedAt = Date.now() - this.audioFiles[0].startedAt;
-    this.audioFiles[0].hasBeenPaused = true;
+    let i = this.getAudioFilesID(channelID);
+    this.audioFiles[i].source.stop();
+    this.audioFiles[i].pausedAt = Date.now() - this.audioFiles[0].startedAt;
+    this.audioFiles[i].pausedRecently = true;
+  }
+
+  getAudioFilesID(channelID){
+    for(let i = 0;i < this.audioFiles.length;i++){
+      if(this.audioFiles[i].audioId===channelID){
+        return i;
+      }
+    }
+    //TODO error handling
+    return -1;
   }
 
   retrieveDataAndLoadAudioFiles(){
@@ -206,6 +231,7 @@ class VirtualRadio extends React.Component{
     )
     .then( response =>{
       const json = response.data;
+      console.log("data:", json);
       this.loadAudioFiles(json, token);
       this.setState({
         data: json,
@@ -219,31 +245,71 @@ class VirtualRadio extends React.Component{
   }
 
   async loadAudioFiles(data, token){
-          const response = await axios.get("https://radio.ethylomat.de/media/Zuse.mp3",{
-              responseType: 'arraybuffer'
-          });
-          const audioContext = this.getAudioContext();
-          const audioBuffer = await audioContext.decodeAudioData(response.data);
-          const source = audioContext.createBufferSource();
-          const gainNode = audioContext.createGain();
-          source.buffer = audioBuffer;
-          this.audioFiles[0] = {
-            audioId: 0,
-            audioContext: audioContext,
-            audioBuffer:audioBuffer,
-            source:source,
-            gainNode: gainNode,
-            startedAt: null,
-            pausedAt: null,
-            hasBeenPaused: false,
-          };
-          
-          this.audioFiles[0].source.connect(this.audioFiles[0].gainNode);
-          this.audioFiles[0].gainNode.connect(this.audioFiles[0].audioContext.destination);
+          this.gainNode.gain.value = this.state.volumeValue;
+
+          for(let i = 0; i < data.length; i++){
+            const source = this.audioContext.createBufferSource();
+            var url = data[i].files[0].media_file;
+            let response = await axios.get(url,{
+                responseType: 'arraybuffer'
+            });
+            let audioBuffer = await this.audioContext.decodeAudioData(response.data);
+            source.buffer = audioBuffer;
+            this.audioFiles[i] = {
+              audioId:data[i].id,
+              audioBuffer:audioBuffer,
+              source:source,
+              startedAt: null,
+              pausedAt: null,
+              pausedRecently: false,
+            };
+            this.audioFiles[i].source.connect(this.gainNode);
+            this.gainNode.connect(this.audioContext.destination);
+        }
+
           this.setState({
             isDataLoaded: true
           });
   }
+
+  playNoise(){
+    if(!this.isNoiseRunning){
+      const noise = this.audioContext.createBufferSource();
+      noise.buffer = this.noiseBuffer;
+      noise.loop = true;
+      noise.connect(this.gainNode);
+      noise.start(this.audioContext.currentTime);
+      this.noise = noise;
+      this.isNoiseRunning = true;
+    }
+
+  }
+
+  stopNoise(){
+    if(this.isNoiseRunning){
+      this.isNoiseRunning = false;
+      this.noise.stop(this.audioContext.currentTime);
+    }
+  }
+
+  generateBrownNoise(context){
+  var bufferSize = 2 * context.sampleRate;
+  var brownBuffer = context.createBuffer(
+    1,
+    bufferSize,
+    context.sampleRate
+  );
+  var noiseData = brownBuffer.getChannelData(0);
+  var lastOut = 0.0;
+  for (var i = 0; i < bufferSize; i++) {
+    var white = Math.random() * 2 - 1;
+    noiseData[i] = (lastOut + 0.02 * white) / 1.02;
+    lastOut = noiseData[i];
+    noiseData[i] *= 3.5;
+  }
+  return brownBuffer;
+}
+
 
   getAudioContext(){
     const audioContext = new AudioContext();
