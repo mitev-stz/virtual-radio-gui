@@ -6,7 +6,7 @@ class Home extends React.Component {
     return (
       <div className="home centered-container bordered-component">
         <div className="centered-context">
-          Hey there! Welcome to out project!
+          Hey there! Welcome to our project!
         </div>
       </div>
     );
