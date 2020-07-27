@@ -5,6 +5,7 @@ import Tuner from "../Tuner/Tuner";
 import VolumeController from "../VolumeController/VolumeController";
 import QuickChannelButtonList from "../QuickChannelButtonList/QuickChannelButtonList";
 import "./assets/styles/virtualRadio.css";
+import design from './assets/img/old_radio.jpeg';
 
 class VirtualRadio extends React.Component{
   constructor(props){
@@ -15,6 +16,8 @@ class VirtualRadio extends React.Component{
     this.gainNode = this.audioContext.createGain();
     this.noiseBuffer = this.generateBrownNoise(this.audioContext);
     this.isNoiseRunning = false;
+    this.tuner = null;
+    this.volumeIntervalId = null;
   }
     state = {
         data:[],
@@ -46,40 +49,106 @@ class VirtualRadio extends React.Component{
       return <div>Loading Data... </div>
     } else {
       return (
-        <div className="centered-container virtRadio">
-          <div className="radio-inner-case">
-            <div className="radio-front-case">
-              <div className="radio-panel">
-                  <PowerSwitch
-                    handleToggleSwitchAction={this.handleToggleSwitchAction}
-                    isRadioLive={isRadioLive}
-                  ></PowerSwitch>
-                  <Tuner
-                    targetFreq={targetFreq}
-                    isRadioLive={isRadioLive}
-                    data={data}
-                    isChannelStreaming={isChannelStreaming}
-                    streamingChannelID={streamingChannelID}
-                    parentCallback = {this.handleCallbackFromTuner}
-                    ></Tuner>
-                  <VolumeController
-                    parentCallback={this.changeVolumeValue}
-                    volumeValue={this.state.volumeValue}>
-                  </VolumeController>
+        <div className="centered-container">
+          <div className="radio-container">
+          <div className="centered-container virtRadio">
+            <div className="radio-inner-case">
+              <div className="radio-front-case">
+                <div className="radio-panel">
+                    <PowerSwitch
+                      handleToggleSwitchAction={this.handleToggleSwitchAction}
+                      isRadioLive={isRadioLive}
+                    ></PowerSwitch>
+                    <Tuner
+                      onRef={ref => (this.tuner = ref)}
+                      targetFreq={targetFreq}
+                      isRadioLive={isRadioLive}
+                      data={data}
+                      isChannelStreaming={isChannelStreaming}
+                      streamingChannelID={streamingChannelID}
+                      parentCallback = {this.handleCallbackFromTuner}
+                      ></Tuner>
+                    <VolumeController
+                      parentCallback={this.changeVolumeValue}
+                      volumeValue={this.state.volumeValue}>
+                    </VolumeController>
+            </div>
+          </div>
+            <QuickChannelButtonList
+              data={data}
+                parentCallback={this.handleQuickChannelButtonClick}>
+            </QuickChannelButtonList>
+          </div>
           </div>
         </div>
-          <QuickChannelButtonList
-            data={data}
-              parentCallback={this.handleQuickChannelButtonClick}>
-          </QuickChannelButtonList>
-        </div>
+          <div className="centered-container image-container">
+            <img src={design} alt="old radio" useMap="#oldRadioMap"></img>
+            <map name="oldRadioMap">
+              <area className="area2" shape="rect" coords="450,617,480, 652" onClick={this.handleToggleSwitchAction} alt="power-switch-btn" ></area>
+              <area shape="poly" coords="229,492, 199,530, 232,570" onMouseDown={this.handleDecrDownFromVolume} onMouseUp={this.handleMouseUpFromVolume} alt="volume-controller-decr-btn" ></area>
+              <area shape="poly" coords="232,492, 288,573, 233,571" onMouseDown={this.handleIncrDownFromVolume} onMouseUp={this.handleMouseUpFromVolume} alt="volume-controller-incr-btn" ></area>
+              <area shape="poly" coords="970,503, 940,540, 980,580" onMouseDown={this.handleDecrDownFromTuner} onMouseUp={this.handleMouseUpFromTuner} alt="tuner-decr-btn" ></area>
+              <area shape="poly" coords="971,503, 1015,550, 981,581" onMouseDown={this.handleIncrDownFromTuner} onMouseUp={this.handleMouseUpFromTuner} alt="tuner-decr-btn" ></area>
+            </map>
+          </div>
         </div>
       );
 
     }
   }
 
+  handleDecrDownFromVolume = () => {
+    this.volumeIntervalId = window.setInterval(() => {
+      this.decrementVolumeValueFromInterval();
+    },100);
+  }
+
+  handleIncrDownFromVolume = () => {
+    this.volumeIntervalId = window.setInterval(() => {
+      this.incrementVolumeValueFromInterval();
+    },100);
+  }
+
+  handleMouseUpFromVolume = () =>{
+    clearInterval(this.volumeIntervalId);
+  }
+
+  incrementVolumeValueFromInterval(){
+    let vol = parseFloat(this.state.volumeValue);
+      if(vol+0.05<=1){
+        vol +=0.05;
+        this.setState({
+          volumeValue: vol
+        });
+        this.applyVolumeChangeOnAudio(vol);
+      }
+  }
+
+  decrementVolumeValueFromInterval(){
+    let vol = parseFloat(this.state.volumeValue);
+      if(vol-0.05>=0){
+        vol -=0.05;
+        this.setState({
+          volumeValue: vol
+        });
+        this.applyVolumeChangeOnAudio(vol);
+      }
+  }
+
+  handleDecrDownFromTuner = () => {
+    this.tuner.onDecrDown();
+  }
+
+  handleIncrDownFromTuner = () =>{
+    this.tuner.onIncrDown();
+  }
+
+  handleMouseUpFromTuner = () =>{
+    this.tuner.onIncUp();
+  }
+
   changeVolumeValue = (volumeControllerData) => {
+
     this.setState({
       volumeValue: volumeControllerData
     });
@@ -229,7 +298,6 @@ class VirtualRadio extends React.Component{
     )
     .then( response =>{
       const json = response.data;
-      console.log("data:", json);
       this.loadAudioFiles(json, token);
       this.setState({
         data: json,

@@ -16,6 +16,14 @@ class Tuner extends React.Component {
     targetFreq:this.props.targetFreq
   }
 
+  componentDidMount(){
+    this.props.onRef(this);
+  }
+
+  componentWillUnmount(){
+    this.props.onRef(undefined);
+  }
+
   render () {
     const{targetFreq, isRadioLive, data, streamingChannelID, isChannelStreaming} = this.props;
     return (

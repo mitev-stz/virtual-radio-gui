@@ -4,9 +4,9 @@ import './assets/styles/home.css';
 class Home extends React.Component {
   render() {
     return (
-      <div className="Home centered-container bordered-component">
+      <div className="home centered-container bordered-component">
         <div className="centered-context">
-          Hello World! Entry!
+          Hey there! Welcome to out project!
         </div>
       </div>
     );

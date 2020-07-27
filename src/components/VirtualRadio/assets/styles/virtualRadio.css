@@ -1,13 +1,17 @@
+.radio-container{
+  height: 500px;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
 .virtRadio{
   border: 3px solid #21150c;
   background-color: #3c2302;
-  height: 55%;
+  height: 100%;
   min-height: 400px;
   min-width: 1000px;
   max-height: 516px;
   max-width: 1200px;
-  margin-top: 5%;
-  margin-bottom: 5%;
   color: #ccd6d3;
 }
 .radio-inner-case{
@@ -28,10 +32,23 @@
   height: 90%;
   position: relative;
 }
+.area2{
+  display: none;
+  background-color: red;
+  z-index: -1;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+.image-container{
+  user-select: none;
+  text-align: center;
+}
 .virtRadio:before{
       opacity: .4;
       content: "Awesome Radio";
-      display: block;
+      display: inline;
       height: auto;
       width: 90%;
       padding-top: 5px;

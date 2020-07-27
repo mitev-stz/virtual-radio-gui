@@ -9,6 +9,7 @@ import './assets/styles/index.css';
 
 const Root = () =>(
   <Router>
+    <div className="main">
     <div className="header header-background">
       <nav className="navbar navbar-expand-lg navbar-light">
           <ul className="navbar-nav">
@@ -29,8 +30,9 @@ const Root = () =>(
       <Route exact path="/about" component={About}/>
       <Route exact path="/virtualRadio" component={VirtualRadio}/>
     </Switch>
+    </div>
     <div className="footer centered-container">
-      <div className="footer-bottom">
+      <div className="footer-content">
         Footer contact me here!
       </div>
     </div>
