@@ -4,8 +4,13 @@ import PowerSwitch from "../PowerSwitch/PowerSwitch";
 import Tuner from "../Tuner/Tuner";
 import VolumeController from "../VolumeController/VolumeController";
 import QuickChannelButtonList from "../QuickChannelButtonList/QuickChannelButtonList";
+import ChannelDescription from "../ChannelDescription/ChannelDescription";
 import "./assets/styles/virtualRadio.css";
+import {changeAnimationRotation} from "./scripts/rotationChange.js";
+import {startTimer, stopTimerGetTime} from "./scripts/stopwatch.js"
 import design from './assets/img/old_radio.jpeg';
+import tuner from './assets/img/controller_right.png';
+import volume from './assets/img/controller_left.png';
 
 class VirtualRadio extends React.Component{
   constructor(props){
@@ -18,6 +23,8 @@ class VirtualRadio extends React.Component{
     this.isNoiseRunning = false;
     this.tuner = null;
     this.volumeIntervalId = null;
+    this.volDeg = 0;
+    this.tunerDeg = 0;
   }
     state = {
         data:[],
@@ -35,6 +42,10 @@ class VirtualRadio extends React.Component{
       this.handleCallbackFromTuner = this.handleCallbackFromTuner.bind(this);
       this.changeVolumeValue = this.changeVolumeValue.bind(this);
       this.handleQuickChannelButtonClick = this.handleQuickChannelButtonClick.bind(this);
+      this.handleIncrDownFromVolume = this.handleMouseDownFromVolume.bind(this, true);
+      this.handleDecrDownFromVolume = this.handleMouseDownFromVolume.bind(this, false);
+      this.handleSwitchMouseUp = this.handleSwitchMouseAction.bind(this, false);
+      this.handleSwitchMouseDown = this.handleSwitchMouseAction.bind(this, true);
     }
 
     async componentDidMount(){
@@ -49,7 +60,7 @@ class VirtualRadio extends React.Component{
       return <div>Loading Data... </div>
     } else {
       return (
-        <div className="centered-container">
+        <div className="marginTopBottom main-virtualradio">
           <div className="radio-container">
           <div className="centered-container virtRadio">
             <div className="radio-inner-case">
@@ -81,15 +92,29 @@ class VirtualRadio extends React.Component{
           </div>
           </div>
         </div>
-          <div className="centered-container image-container">
-            <img src={design} alt="old radio" useMap="#oldRadioMap"></img>
-            <map name="oldRadioMap">
-              <area className="area2" shape="rect" coords="450,617,480, 652" onClick={this.handleToggleSwitchAction} alt="power-switch-btn" ></area>
-              <area shape="poly" coords="229,492, 199,530, 232,570" onMouseDown={this.handleDecrDownFromVolume} onMouseUp={this.handleMouseUpFromVolume} alt="volume-controller-decr-btn" ></area>
-              <area shape="poly" coords="232,492, 288,573, 233,571" onMouseDown={this.handleIncrDownFromVolume} onMouseUp={this.handleMouseUpFromVolume} alt="volume-controller-incr-btn" ></area>
-              <area shape="poly" coords="970,503, 940,540, 980,580" onMouseDown={this.handleDecrDownFromTuner} onMouseUp={this.handleMouseUpFromTuner} alt="tuner-decr-btn" ></area>
-              <area shape="poly" coords="971,503, 1015,550, 981,581" onMouseDown={this.handleIncrDownFromTuner} onMouseUp={this.handleMouseUpFromTuner} alt="tuner-decr-btn" ></area>
-            </map>
+        <div className="channel-description-for-image-container centered-container">
+          <ChannelDescription
+            channel={data.filter(channel => channel.id === streamingChannelID)[0]}
+            isRadioLive={isRadioLive}
+            isChannelStreaming={isChannelStreaming}>
+          </ChannelDescription>
+        </div>
+          <div className="awesomeradioimage-container">
+          <div className="awesomeradio-title"> The Awesome Radio</div>
+          <div className="centered-container radio-image-container ">
+            <img className="oldRadioImg" src={design} alt="old radio"></img>
+            <span className="tuner-span">
+            <img id="tuner" className="tunerImg" src={tuner} alt="comp1"></img>
+            <span className="tunerLeftBtn" onMouseDown={this.handleDecrDownFromTuner} onMouseUp={this.handleMouseUpFromTunerOnDecr}></span>
+            <span className="tunerRightBtn" onMouseDown={this.handleIncrDownFromTuner} onMouseUp={this.handleMouseUpFromTunerOnInc}></span>
+            </span>
+            <span className="vol-span">
+              <img id="vol" className="volImg" src={volume} alt="comp2"></img>
+              <span className="volLeftBtn" onMouseDown={this.handleDecrDownFromVolume} onMouseUp={this.handleMouseUpFromVolumeOnDecr} ></span>
+              <span className="volRightBtn" onMouseDown={this.handleIncrDownFromVolume} onMouseUp={this.handleMouseUpFromVolumeOnInc}></span>
+            </span>
+            <span id="powerSwitch" className="powSwitch" onMouseDown={this.handleSwitchMouseDown} onMouseUp={this.handleSwitchMouseUp}></span>
+          </div>
           </div>
         </div>
       );
@@ -97,26 +122,60 @@ class VirtualRadio extends React.Component{
     }
   }
 
-  handleDecrDownFromVolume = () => {
-    this.volumeIntervalId = window.setInterval(() => {
-      this.decrementVolumeValueFromInterval();
-    },100);
+  handleSwitchMouseAction = (b) => {
+    let pow = document.getElementById("powerSwitch");
+    if(b){
+      pow.classList.add("powSwitch-clicked");
+    } else{
+      pow.classList.remove("powSwitch-clicked");
+      this.handleToggleSwitchAction();
+    }
   }
 
-  handleIncrDownFromVolume = () => {
-    this.volumeIntervalId = window.setInterval(() => {
-      this.incrementVolumeValueFromInterval();
-    },100);
+  handleMouseDownFromVolume = (b) => {
+    var vol = document.getElementById("vol");
+    startTimer();
+    if(b){
+      vol.classList.add("rotate-normal");
+      this.volumeIntervalId = window.setInterval(() => {
+        this.incrementVolumeValueFromInterval();
+      },100);
+    } else {
+      vol.classList.add("rotate-reverse");
+      this.volumeIntervalId = window.setInterval(() => {
+        this.decrementVolumeValueFromInterval();
+      },100);
+    }
   }
 
-  handleMouseUpFromVolume = () =>{
+  handleMouseUpFromVolumeOnDecr = () => {
+    var vol = document.getElementById("vol");
+    vol.classList.remove("rotate-reverse");
+    vol.classList.remove("rotate-normal");
+    var milis = stopTimerGetTime();
+    milis = milis/1000;
+    this.volDeg = (this.volDeg - ((milis*36)%360))%360;
+    changeAnimationRotation('rotate', this.volDeg);
+    vol.style.transform = "rotate("+ this.volDeg +"deg)";
+    clearInterval(this.volumeIntervalId);
+  }
+
+  handleMouseUpFromVolumeOnInc = () =>{
+    var vol = document.getElementById("vol");
+    vol.classList.remove("rotate-reverse");
+    vol.classList.remove("rotate-normal");
+    var milis = stopTimerGetTime();
+    milis = milis/1000;
+    this.volDeg = (this.volDeg + ((milis*36)%360))%360;
+    changeAnimationRotation('rotate', this.volDeg);
+    vol.style.transform = "rotate("+ this.volDeg +"deg)";
     clearInterval(this.volumeIntervalId);
   }
 
   incrementVolumeValueFromInterval(){
     let vol = parseFloat(this.state.volumeValue);
-      if(vol+0.05<=1){
-        vol +=0.05;
+      if(vol+0.02<=1){
+        vol +=0.02;
         this.setState({
           volumeValue: vol
         });
@@ -126,8 +185,8 @@ class VirtualRadio extends React.Component{
 
   decrementVolumeValueFromInterval(){
     let vol = parseFloat(this.state.volumeValue);
-      if(vol-0.05>=0){
-        vol -=0.05;
+      if(vol-0.02>=0){
+        vol -=0.02;
         this.setState({
           volumeValue: vol
         });
@@ -137,18 +196,37 @@ class VirtualRadio extends React.Component{
 
   handleDecrDownFromTuner = () => {
     this.tuner.onDecrDown();
+    startTimer();
   }
 
   handleIncrDownFromTuner = () =>{
     this.tuner.onIncrDown();
+    startTimer();
   }
 
-  handleMouseUpFromTuner = () =>{
+  handleMouseUpFromTunerOnDecr = () =>{
     this.tuner.onIncUp();
+    var tunerImg = document.getElementsByClassName('tunerImg')[0];
+    tunerImg.classList.remove('rotate-reverse');
+    var milis = stopTimerGetTime();
+    milis = milis/1000;
+    this.tunerDeg = (this.tunerDeg - ((milis*36)%360))%360;
+    changeAnimationRotation('rotate', this.tunerDeg);
+    tunerImg.style.transform = "rotate("+ this.tunerDeg +"deg)";
+  }
+
+  handleMouseUpFromTunerOnInc = () =>{
+    this.tuner.onIncUp();
+    var tunerImg = document.getElementsByClassName('tunerImg')[0];
+    tunerImg.classList.remove('rotate-reverse');
+    var milis = stopTimerGetTime();
+    milis = milis/1000;
+    this.tunerDeg = (this.tunerDeg + ((milis*36)%360))%360;
+    changeAnimationRotation('rotate', this.tunerDeg);
+    tunerImg.style.transform = "rotate("+ this.tunerDeg +"deg)";
   }
 
   changeVolumeValue = (volumeControllerData) => {
-
     this.setState({
       volumeValue: volumeControllerData
     });

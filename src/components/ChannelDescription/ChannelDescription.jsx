@@ -3,8 +3,8 @@ import "./assets/styles/channelDescription.css";
 
 
 const ChannelDescription = (props) => {
-    let title = "No Title";
-    let description = "Description: No streaming Channel at this frequency!";
+    let title = "No title!";
+    let description = "No streaming channel at this frequency!";
 
     if(props.isRadioLive && props.isChannelStreaming){
       title = props.channel.title;

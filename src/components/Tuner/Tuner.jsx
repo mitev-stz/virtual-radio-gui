@@ -2,7 +2,6 @@ import React from 'react';
 import Retina from "../Retina/Retina";
 import "./assets/styles/tuner.css";
 
-
 class Tuner extends React.Component {
   constructor(props){
     super(props);
@@ -47,13 +46,19 @@ class Tuner extends React.Component {
   onDecrDown(){
     var decrBtn = document.getElementsByClassName('freqDecrButton')[0];
     decrBtn.classList.add('btnClicked');
+    var tuner = document.getElementById('tuner');
+    tuner.classList.add('rotate-reverse');
     this.intervalId = window.setInterval(() => {
       this.updateIntervalDecr();
     },100);
+
   }
   onIncrDown(){
     var incrBtn = document.getElementsByClassName('freqIncrButton')[0];
     incrBtn.classList.add('btnClicked');
+
+    var tuner = document.getElementById('tuner');
+    tuner.classList.add('rotate-normal');
     this.intervalId = window.setInterval(() => {
       this.updateIntervalIncr();
     },100);
@@ -85,8 +90,12 @@ class Tuner extends React.Component {
   onIncUp(){
     document.getElementsByClassName('freqDecrButton')[0].classList.remove('btnClicked');
     document.getElementsByClassName('freqIncrButton')[0].classList.remove('btnClicked');
+    var tuner = document.getElementById('tuner');
+    tuner.classList.remove('rotate-normal');
+    tuner.classList.remove('rotate-reverse');
     clearInterval(this.intervalId);
   }
+
 }
 
 export default Tuner;
