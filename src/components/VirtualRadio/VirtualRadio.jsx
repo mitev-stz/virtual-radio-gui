@@ -60,7 +60,7 @@ class VirtualRadio extends React.Component{
       return <div>Loading Data... </div>
     } else {
       return (
-        <div className="marginTopBottom main-virtualradio">
+        <div className="marginTopBottom main-virtualradio background-white">
           <div className="radio-container">
           <div className="centered-container virtRadio">
             <div className="radio-inner-case">

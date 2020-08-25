@@ -11,7 +11,6 @@ class Root extends React.Component{
   constructor(props){
     super(props);
     this.openCloseSocialContacts = this.openCloseSocialContacts.bind(this);
-    this.closeSocialContacts = this.openCloseSocialContacts.bind(this);
   }
   render(){
     return (
@@ -45,11 +44,11 @@ class Root extends React.Component{
         </div>
           <div className="contact-info display-none">
             {/*eslint-disable-next-line*/}
-            <a href="https://facebook.com" className="fa fa-facebook" onClick={this.closeSocialContacts}></a>
+            <a href="https://facebook.com" className="fa fa-facebook" onClick={this.openCloseSocialContacts}></a>
             {/*eslint-disable-next-line*/}
-            <a href="https://facebook.com" className="fa fa-twitter" onClick={this.closeSocialContacts}></a>
+            <a href="https://facebook.com" className="fa fa-twitter" onClick={this.openCloseSocialContacts}></a>
             {/*eslint-disable-next-line*/}
-            <a href="https://facebook.com" className="fa fa-google" onClick={this.closeSocialContacts}></a>
+            <a href="https://facebook.com" className="fa fa-google" onClick={this.openCloseSocialContacts}></a>
           </div>
       </div>
     </div>

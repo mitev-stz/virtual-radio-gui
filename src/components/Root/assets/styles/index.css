@@ -3,13 +3,18 @@
   font-weight: 400;
   font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #222;
-  font-size: 20px;
+  font-size: 1.3rem;
   min-height: 100vh;
   position: relative;
-  background-color: #efddc696;
+  background-color: #fdf2e42e;
 }
 .header{
-  height: 5%;
+  width: 100%;
+  position: fixed;
+  top:0;
+  font-style: oblique;
+  font-family: Arial;
+  font-size: 1.45rem;
 }
 .centered-container{
   margin-left: auto;
@@ -29,21 +34,23 @@
   align-items: center;
 }
 .header-background{
-  background-color: #eadd8cc7;
+  background-image: linear-gradient(to right, #f5cf8b 60%, transparent);
 }
 
 .bordered-component{
   border: 1px solid #c3c3c3;
 }
 .main{
+  font-family: Raleway;
   padding-bottom: 1em;
 }
 .route-switch{
   grid-column: 2/3;
 }
 .main-content{
+  margin-top: 3em;
   display:grid;
-  grid-template-columns: 2% 1fr 6% 2%;
+  grid-template-columns: 7% 1fr 5% 2%;
 }
 .footer{
   user-select: none;
@@ -68,6 +75,7 @@
 .footer:hover{
   background-color: rgb(241 212 20 / 62%);
   color:#c31d1dcc;
+  cursor: pointer;
 }
 .contact-info{
   position: fixed;
@@ -114,4 +122,19 @@
 .fa-google {
   background: #dd4b39;
   color: white;
+}
+.hidden{
+  display: none;
+}
+.visible{
+  display: initial;
+}
+.text-underline{
+ text-decoration: underline;
+ user-select: none;
+ cursor: pointer;
+}
+section{
+  margin-top: 3vh;
+  margin-bottom: 3vh;
 }

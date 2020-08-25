@@ -1,15 +1,86 @@
 .home {
   text-align: center;
+  background-color: white;
 }
-.test{
-  background-color: yellow;
+.home-title{
+  text-align: left;
+  margin-top: 2vh;
+  margin-bottom: 2vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 1em;
+  height: 15em;
+  font-size: 30px;
+  font-family: "Courier New", Helvetica, Arial;
+  background-image: url("../../../../assets/img/title_background.png"), linear-gradient(to right, #e5f4f1, #d8ede8);
+  background-size: 100% 120%;
+  background-position: left 100%;
+  background-repeat: no-repeat;
+}
+.home-info-content{
+  font-family: Raleway;
+  display: flex;
+  padding-top: 2em;
+}
+.home-info-content div{
+  font-size: 1.5rem;
+  text-align: left;
+  width: 60%;
 }
 .project-plan-overview img{
   max-width: 100%;
   max-height: 100%;
 }
 .project-plan-overview{
-  height: 419px;
   width: 700px;
-  margin: 1% 1%;
+  height: 410px;
+  display: flex;
+  justify-content: flex-end;
+}
+.section-content{
+  display: flex;
+  justify-content: space-around;
+}
+.section-1{
+  background-color: #fffbd0d4;
+  position: relative;
+}
+.section{
+  border-radius: 10px;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  font-family: Courier ;
+}
+.section-title{
+  font-size: 26px;
+  padding-bottom: 1em;
+  font-family: "Courier New", Helvetica, Arial;
+}
+.section-2{
+  background-color: #ffeac4d4;
+}
+.section-3{
+  background-color: #efd9d1e0;
+}
+
+.home-title .slogan{
+  font-size: 18px;
+  text-decoration: overline;
+}
+.hardware-radio-img{
+  height: 300px;
+  width: 600px;
+}
+.hardware-radio-img img{
+  max-width: 100%;
+  max-height: 100%;
+}
+.clickables-container{
+
+}
+.section .clickable:hover{
+  text-decoration: underline;
+  cursor: pointer;
+  user-select: none;
 }
