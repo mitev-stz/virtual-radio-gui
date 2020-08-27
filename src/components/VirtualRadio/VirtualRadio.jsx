@@ -393,7 +393,7 @@ class VirtualRadio extends React.Component{
 
           for(let i = 0; i < data.length; i++){
             const source = this.audioContext.createBufferSource();
-            var url = data[i].files[0].media_file;
+            var url = data[i].files[1].media_file;
             let response = await axios.get(url,{
                 responseType: 'arraybuffer'
             });
