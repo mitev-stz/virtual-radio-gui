@@ -394,8 +394,8 @@ class VirtualRadio extends React.Component{
           for(let i = 0; i < data.length; i++){
             const source = this.audioContext.createBufferSource();
             var url = data[i].files[1].media_file;
-            let response = await axios.get(url,{
-                responseType: 'arraybuffer'
+            let response = await axios.get("https://cors-anywhere.herokuapp.com/" + url,{
+              responseType: 'arraybuffer'
             });
             let audioBuffer = await this.audioContext.decodeAudioData(response.data);
             source.buffer = audioBuffer;
