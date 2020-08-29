@@ -177,6 +177,37 @@
   grid-column: 0/1;
   border: 1px solid black;
 }
+.info-box{
+  padding-top: 1em;
+  padding-bottom: 1em;
+  background-color: white;
+  text-align: left;
+  padding-left: 1em;
+  padding-right: 1em;
+  color: #3078e4;
+  border-radius: 10px;
+  border: 1.5px solid #3078e4;
+  position: relative;
+  top: -465px;
+  left: 100px;
+  width:  300px;
+  max-width: 30%;
+  opacity: 0.8;
+}
+.info-box:hover{
+  opacity: 1;
+}
+.closeInfoBox{
+  border-radius: 10px;
+  border: 1px solid #3078e4;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.closeInfoBox:hover{
+  background-color: #3078e4;
+  color: white;
+}
 @keyframes rotate {
   0%{
     transform: rotate(0deg);

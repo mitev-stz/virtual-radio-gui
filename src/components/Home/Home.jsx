@@ -13,7 +13,7 @@ class Home extends React.Component {
             <div>
               The Radio Project
                 <div className="slogan">
-                  "...because getting involved is important."
+                  Computer science for the new generations.
                 </div>
             </div>
           </div>
@@ -32,13 +32,7 @@ class Home extends React.Component {
           <div className="section-title">The Hardware Radio</div>
           <div className="section-content">
               <div className="section-intro">
-                asdfggamfksvasdfggamfksasdfggamfksasdfggamfksasdfggamfksasdfggamfksasdfgga
-                mfksasdfggam
-                fksasdfggamfksasdfggam
-                fksasdfggamf
-                ksasdfggamf
-                ksasdfggamfksasdfgga
-                mfksasdfggamfksasdfggamfks
+                This is some content.
               </div>
 
               <div className="hardware-radio-img">
@@ -46,9 +40,9 @@ class Home extends React.Component {
               </div>
               <div className="clickables-container">
                 <div className="milestones-clickable">
-                  <span className="clickable">Milestones history</span>
+                  <span className="clickable" onClick={this.clickableOnClick}>Milestones history</span>
 
-                  <div className="milestones hardware-radio-milestones hidden">
+                  <div className="hidden">
                       <ul>
                         <li>
                           11.05. - First backend API for testing (Backend)
@@ -80,11 +74,14 @@ class Home extends React.Component {
                       </ul>
                   </div>
                 </div>
+
                 <div className="challenges-clickable">
-                  <span className="clickable">Challenges on the road</span>
+                  <span className="clickable"  onClick={this.clickableOnClick}>Challenges on the road</span>
+                  <div className="hidden"> challenes </div>
                 </div>
                 <div className="purpose-clickable">
-                  <span className="clickable">Purpose</span>
+                  <span className="clickable"  onClick={this.clickableOnClick}>Purpose</span>
+                  <div className="hidden"> purpose</div>
                 </div>
               </div>
           </div>
@@ -101,9 +98,9 @@ class Home extends React.Component {
               </div>
               <div className="clickables-container">
                 <div className="milestones-clickable">
-                  <span className="clickable">Milestones history</span>
+                  <span className="clickable" onClick={this.clickableOnClick}>Milestones history</span>
 
-                  <div className="milestones hardware-radio-milestones hidden">
+                  <div className="hidden">
                       <ul>
                         <li>
                           11.05. - First backend API for testing (Backend)
@@ -136,10 +133,12 @@ class Home extends React.Component {
                   </div>
                 </div>
                 <div className="challenges-clickable">
-                  <span className="clickable">Challenges on the road</span>
+                  <span className="clickable"  onClick={this.clickableOnClick}>Challenges on the road</span>
+                  <div className="hidden"> challenges</div>
                 </div>
                 <div className="purpose-clickable">
-                  <span className="clickable">Purpose</span>
+                  <span className="clickable" onClick={this.clickableOnClick}>Purpose</span>
+                  <div className="hidden"> purposee</div>
                 </div>
               </div>
           </div>
@@ -156,9 +155,9 @@ class Home extends React.Component {
               </div>
               <div className="clickables-container">
                 <div className="milestones-clickable">
-                  <span className="clickable">Milestones history</span>
+                  <span className="clickable"  onClick={this.clickableOnClick}>Milestones history</span>
 
-                  <div className="milestones hardware-radio-milestones hidden">
+                  <div className="hidden">
                       <ul>
                         <li>
                           11.05. - First backend API for testing (Backend)
@@ -191,21 +190,24 @@ class Home extends React.Component {
                   </div>
                 </div>
                 <div className="challenges-clickable">
-                  <span className="clickable">Challenges on the road</span>
-
+                  <span className="clickable"  onClick={this.clickableOnClick}> Challenges on the road</span>
+                  <div className="hidden"> challenges</div>
                 </div>
                 <div className="purpose-clickable">
-                  <span className="clickable">Purpose</span>
+                  <span className="clickable"  onClick={this.clickableOnClick}>Purpose</span>
+                  <div className="hidden"> purpose</div>
                 </div>
               </div>
           </div>
         </section>
-
-
-
-
       </div>
     );
+  }
+
+  clickableOnClick = (e) => {
+    let element = e.target.parentNode.lastElementChild;
+    if(element.classList.contains("hidden")) element.classList.remove("hidden")
+    else element.classList.add("hidden");
   }
 }
 

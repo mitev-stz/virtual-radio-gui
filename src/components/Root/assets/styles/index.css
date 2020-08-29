@@ -21,13 +21,6 @@
   margin-right: auto;
   align-content: center;
 }
-.marginTopBottom{
-  margin-top: 1vh;
-  margin-bottom: 1vh;
-}
-.height-100{
-  height: 100%;
-}
 .centered-context{
   display: flex;
   justify-content: center;
