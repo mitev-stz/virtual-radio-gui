@@ -83,11 +83,11 @@
   width: 1147px;
   position: relative;
 }
-.powSwitch{
+.powerSwitch{
   position: absolute;
+  object-fit: contain;
   left: 421px;
   bottom: 74px;
-  object-fit: contain;
   height: 40px;
   width: 40px;
   background-image: url('btn_final.png');
@@ -159,8 +159,7 @@
   height: 100%;
   right: 0px;
 }
-
-.powSwitch-clicked{
+.channel-btn-clicked{
   background-image: linear-gradient(to right,#dec98ab3 0%,#efdba5e6 100%), url('btn_final.png');
   background-blend-mode: screen;
 }

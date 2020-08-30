@@ -1,13 +1,9 @@
-.quickChannelBtn{
-  border: 3px solid #4c3f29f0;
-  background-color: #947030f0;
-  float: left;
-  margin-left: 0.2em;
-  margin-right: 0.2em;
-  max-width: 15%;
-  max-height: 90%;
-  word-wrap: break-word;
-}
-.quickChannelBtn:hover{
-  background-color: #e6b969f0;
+.channel-btn{
+  object-fit: contain;
+  height: 40px;
+  width: 40px;
+  background-image: url('btn_final.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 }
