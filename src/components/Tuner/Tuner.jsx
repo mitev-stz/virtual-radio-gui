@@ -1,5 +1,4 @@
 import React from 'react';
-import Retina from "../Retina/Retina";
 import "./assets/styles/tuner.css";
 
 class Tuner extends React.Component {
@@ -24,17 +23,8 @@ class Tuner extends React.Component {
   }
 
   render () {
-    const{targetFreq, isRadioLive, data, streamingChannelID, isChannelStreaming} = this.props;
     return (
       <div className="tuner-container">
-            <Retina
-              data-testid = "retina"
-              targetFreq = {targetFreq}
-              isRadioLive = {isRadioLive}
-              data={data}
-              streamingChannelID = {streamingChannelID}
-              isChannelStreaming = {isChannelStreaming}
-              ></Retina>
             <div className="tunerButtons-container">
             <div className="freqDecrButton" onMouseUp={this.onIncUp} onMouseDown={this.onDecrDown} placeholder="decrement-button"> <span className="arrow-left"></span></div>
             <div className="freqIncrButton" onMouseUp={this.onIncUp} onMouseDown={this.onIncrDown} placeholder="increment-button"> <span className="arrow-right"></span></div>
@@ -44,8 +34,6 @@ class Tuner extends React.Component {
   }
 
   onDecrDown(){
-    var decrBtn = document.getElementsByClassName('freqDecrButton')[0];
-    decrBtn.classList.add('btnClicked');
     var tuner = document.getElementById('tuner');
     tuner.classList.add('rotate-reverse');
     this.intervalId = window.setInterval(() => {
@@ -54,9 +42,6 @@ class Tuner extends React.Component {
 
   }
   onIncrDown(){
-    var incrBtn = document.getElementsByClassName('freqIncrButton')[0];
-    incrBtn.classList.add('btnClicked');
-
     var tuner = document.getElementById('tuner');
     tuner.classList.add('rotate-normal');
     this.intervalId = window.setInterval(() => {
@@ -88,8 +73,6 @@ class Tuner extends React.Component {
   }
 
   onIncUp(){
-    document.getElementsByClassName('freqDecrButton')[0].classList.remove('btnClicked');
-    document.getElementsByClassName('freqIncrButton')[0].classList.remove('btnClicked');
     var tuner = document.getElementById('tuner');
     tuner.classList.remove('rotate-normal');
     tuner.classList.remove('rotate-reverse');

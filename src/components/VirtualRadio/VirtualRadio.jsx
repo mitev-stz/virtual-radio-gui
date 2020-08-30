@@ -11,6 +11,7 @@ import {startTimer, stopTimerGetTime} from "./scripts/stopwatch.js"
 import design from './assets/img/old_radio.jpeg';
 import tuner from './assets/img/controller_right.png';
 import volume from './assets/img/controller_left.png';
+import InfoBox from './util/components/InfoBox.jsx';
 
 class VirtualRadio extends React.Component{
   constructor(props){
@@ -102,6 +103,9 @@ class VirtualRadio extends React.Component{
           <div className="awesomeradioimage-container">
           <div className="awesomeradio-title"> The Awesome Radio</div>
           <div className="centered-container radio-image-container ">
+            <div style={{width:"430px", position:"absolute", left: "360px", top: "375px"}}>
+              <div className="frequency-pointer"></div>
+            </div>
             <img className="oldRadioImg" src={design} alt="old radio"></img>
             <span className="tuner-span">
             <img id="tuner" className="tunerImg" src={tuner} alt="comp1"></img>
@@ -114,26 +118,29 @@ class VirtualRadio extends React.Component{
               <span className="volRightBtn" onMouseDown={this.handleIncrDownFromVolume} onMouseUp={this.handleMouseUpFromVolumeOnInc}></span>
             </span>
             <span id="powerSwitch" className="powSwitch" onMouseDown={this.handleSwitchMouseDown} onMouseUp={this.handleSwitchMouseUp}></span>
-            <div className="info-box">
-              <span>
-                <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-info-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                  <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
-                  <circle cx="8" cy="4.5" r="1"/>
-                </svg>
-              </span>
-              <div className="info-box-content">
-                Click and hold on the left/right side of the controller below to decrease/increase the volume.
-                <div className="closeInfoBox">
-                  <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-check-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                    <path fillRule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/>
-                  </svg>
-                  Got it!
-                </div>
-              </div>
-            </div>
+            <InfoBox
+              top={-465}
+              left={100}
+              content={"Click and hold on left/right side of the controller below to decrease/increase the volume."}
+              closeBtn={true}
+              onClose={this.closeInfoBox}
+              ></InfoBox>
+              <InfoBox
+                top={-550}
+                left={420}
+                content={"Press the first button below to turn the radio on/off and use the others to switch between channels."}
+                closeBtn={false}
+                onClose={this.closeInfoBox}
+                ></InfoBox>
+                <InfoBox
+                  top={-850}
+                  left={760}
+                  content={"Click and hold on left/right side of the controller below to decrease/increase the frequency."}
+                  closeBtn={false}
+                  onClose={this.closeInfoBox}
+                  ></InfoBox>
           </div>
+
           </div>
         </div>
       );
@@ -191,6 +198,7 @@ class VirtualRadio extends React.Component{
     clearInterval(this.volumeIntervalId);
   }
 
+
   incrementVolumeValueFromInterval(){
     let vol = parseFloat(this.state.volumeValue);
       if(vol+0.02<=1){
@@ -215,11 +223,15 @@ class VirtualRadio extends React.Component{
 
   handleDecrDownFromTuner = () => {
     this.tuner.onDecrDown();
+    var pointer = document.getElementsByClassName('frequency-pointer')[0];
+    pointer.style.marginLeft = this.state.targetFreq+"%";
     startTimer();
   }
 
   handleIncrDownFromTuner = () =>{
     this.tuner.onIncrDown();
+    var pointer = document.getElementsByClassName('frequency-pointer')[0];
+    pointer.style.marginLeft = this.state.targetFreq+"%";
     startTimer();
   }
 
@@ -344,7 +356,6 @@ class VirtualRadio extends React.Component{
 
   applyVolumeChangeOnAudio = (level) => {
     this.gainNode.gain.value = level * level;
-
   };
 
 
@@ -476,8 +487,23 @@ class VirtualRadio extends React.Component{
   getAudioContext(){
       const audioContext = new AudioContext();
       return audioContext;
+
     };
 
+  closeInfoBox(){
+    let elements = document.getElementsByClassName("info-box");
+    for(let i = 0; i < elements.length; i++){
+      let el = elements[i];
+      el.style.animation = "fade-out 2s normal";
+      el.style.animationFillMode = "forwards";
+    }
+    setTimeout(function(){
+      let elements = document.getElementsByClassName("info-box");
+      for(let j=0; j< elements.length; j++){
+        elements[j].remove();
+      }
+    },3000);
   }
+}
 
 export default VirtualRadio;
