@@ -1,0 +1,19 @@
+.about{
+  background-color: white;
+}
+.about-us-intro img{
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0.7;
+}
+.about-us-intro{
+  font-family: Arial;
+  display: flex;
+  justify-content: center;
+}
+.about-us-intro span{
+    position: absolute;
+    font-size: 3em;
+    z-index: 3;
+
+}
