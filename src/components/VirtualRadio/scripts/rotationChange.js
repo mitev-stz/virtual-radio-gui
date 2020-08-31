@@ -2,7 +2,7 @@ function findKeyframesRule(rule){
         var ss = document.styleSheets;
         console.log(ss);
         for (var i = 0; i < ss.length; ++i) {
-          if(ss[i].href !== null) continue;
+          if(ss[i].href === "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css") continue;
             for (var j = 0; j < ss[i].cssRules.length; ++j) {
                 if (ss[i].cssRules[j].type === window.CSSRule.KEYFRAMES_RULE && ss[i].cssRules[j].name === rule)
                     return ss[i].cssRules[j];
