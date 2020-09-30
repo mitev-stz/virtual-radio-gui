@@ -4,9 +4,9 @@ import "./assets/styles/tuner.css";
 class Tuner extends React.Component {
   constructor(props){
     super(props);
-    this.onIncrement = this.handleMouseDown.bind(this, true);
-    this.onDecrement = this.handleMouseDown.bind(this, false);
-    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onIncrDown = this.onIncrDown.bind(this);
+    this.onDecrDown = this.onDecrDown.bind(this);
+    this.onIncUp = this.onIncUp.bind(this);
     this.intervalId = null;
   }
 
@@ -26,28 +26,21 @@ class Tuner extends React.Component {
     return (
       <div className="tuner-container">
             <div className="tunerButtons-container">
-            <div className="freqDecrButton" onMouseUp={this.onMouseUp} onMouseDown={this.onDecrement} placeholder="decrement-button"> <span className="arrow-left"></span></div>
-            <div className="freqIncrButton" onMouseUp={this.onMouseUp} onMouseDown={this.onIncrement} placeholder="increment-button"> <span className="arrow-right"></span></div>
+            <div className="freqDecrButton" onMouseUp={this.onIncUp} onMouseDown={this.onDecrDown} placeholder="decrement-button"> <span className="arrow-left"></span></div>
+            <div className="freqIncrButton" onMouseUp={this.onIncUp} onMouseDown={this.onIncrDown} placeholder="increment-button"> <span className="arrow-right"></span></div>
           </div>
       </div>
     );
   }
 
-  handleMouseDown = (b) =>{
+  onDecrDown(){
     var tuner = document.getElementById('tuner');
-    if(b){
-      tuner.classList.add('rotate-normal');
-      this.intervalId = window.setInterval(() => {
-        this.updateIntervalIncr();
-      },100);
-    } else {
-      tuner.classList.add('rotate-reverse');
-      this.intervalId = window.setInterval(() => {
-        this.updateIntervalDecr();
-      },100);
-    }
+    tuner.classList.add('rotate-reverse');
+    this.intervalId = window.setInterval(() => {
+      this.updateIntervalDecr();
+    },100);
+
   }
-  
   onIncrDown(){
     var tuner = document.getElementById('tuner');
     tuner.classList.add('rotate-normal');
@@ -79,7 +72,7 @@ class Tuner extends React.Component {
     }
   }
 
-  onMouseUp(){
+  onIncUp(){
     var tuner = document.getElementById('tuner');
     tuner.classList.remove('rotate-normal');
     tuner.classList.remove('rotate-reverse');
