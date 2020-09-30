@@ -52,8 +52,8 @@ class VirtualRadio extends React.Component{
     async componentDidMount(){
       this.retrieveDataAndLoadAudioFiles();
     }
-    componentWillUnmount(){
 
+    componentWillUnmount(){
       this.stopNoise();
       this.deactivateAudioStream();
     }
@@ -91,10 +91,6 @@ class VirtualRadio extends React.Component{
                     </VolumeController>
             </div>
           </div>
-            <QuickChannelButtonList
-              data={data}
-                parentCallback={this.handleQuickChannelButtonClick}>
-            </QuickChannelButtonList>
           </div>
           </div>
         </div>
@@ -122,7 +118,11 @@ class VirtualRadio extends React.Component{
               <span className="volLeftBtn" onMouseDown={this.handleDecrDownFromVolume} onMouseUp={this.handleMouseUpFromVolumeOnDecr} ></span>
               <span className="volRightBtn" onMouseDown={this.handleIncrDownFromVolume} onMouseUp={this.handleMouseUpFromVolumeOnInc}></span>
             </span>
-            <span id="powerSwitch" className="powSwitch" onMouseDown={this.handleSwitchMouseDown} onMouseUp={this.handleSwitchMouseUp}></span>
+            <span id="powerSwitch" className="powerSwitch" onMouseDown={this.handleSwitchMouseDown} onMouseUp={this.handleSwitchMouseUp}></span>
+              <QuickChannelButtonList
+                  data={data}
+                  parentCallback={this.handleQuickChannelButtonClick}>
+              </QuickChannelButtonList>
             <InfoBox
               top={-465}
               left={100}
@@ -153,12 +153,12 @@ class VirtualRadio extends React.Component{
     }
   }
 
-  handleSwitchMouseAction = (b) => {
-    let pow = document.getElementById("powerSwitch");
+  handleSwitchMouseAction = (b, e) => {
+    let pow = e.target;
     if(b){
-      pow.classList.add("powSwitch-clicked");
+      pow.classList.add("channel-btn-clicked");
     } else{
-      pow.classList.remove("powSwitch-clicked");
+      pow.classList.remove("channel-btn-clicked");
       this.handleToggleSwitchAction();
     }
   }
@@ -293,7 +293,6 @@ class VirtualRadio extends React.Component{
   handleQuickChannelButtonClick = (channelID) => {
     const channelClicked = this.state.data.filter(channel => channel.id === channelID)[0];
     let newFreq = ((channelClicked.to_frequency + channelClicked.from_frequency) / 2).toFixed(3);
-
     var pointer = document.getElementsByClassName('frequency-pointer')[0];
     pointer.style.left =  newFreq*100+"%";
 
@@ -331,14 +330,13 @@ class VirtualRadio extends React.Component{
     if(this.state.isRadioLive){
       this.state.data.forEach( channel => {
         if(parseFloat(newFrequency,10) >= channel.from_frequency && parseFloat(newFrequency,10) <= channel.to_frequency){
-          if(!this.state.isChannelStreaming){
-            this.stopNoise();
+          if(!this.state.isChannelStreaming)  this.stopNoise();
+            else this.stopPlayingAudio(this.state.streamingChannelID);
             this.playAudio(channel.id);
-            this.setState({
-              isChannelStreaming : true,
-              streamingChannelID : channel.id
-            });
-          }
+          this.setState({
+            isChannelStreaming : true,
+            streamingChannelID : channel.id
+          });
           isStreamingActive = true;
         }
       });
@@ -402,6 +400,11 @@ class VirtualRadio extends React.Component{
     const token = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
 
     axios.get("https://radio.ethylomat.de/api/v1/channels/"
+      // ,{headers: {
+      //   'Authorization' : `Basic ${token}`,
+      //   "Content-Type": "application/json"
+      //   }
+      // }
     )
     .then( response =>{
       const json = response.data;
@@ -438,6 +441,7 @@ class VirtualRadio extends React.Component{
             };
             this.audioFiles[i].source.connect(this.gainNode);
             this.gainNode.connect(this.audioContext.destination);
+            source.loop = true;
         }
 
           this.setState({
