@@ -43,27 +43,15 @@ class VirtualRadio extends React.Component{
       this.handleCallbackFromTuner = this.handleCallbackFromTuner.bind(this);
       this.changeVolumeValue = this.changeVolumeValue.bind(this);
       this.handleQuickChannelButtonClick = this.handleQuickChannelButtonClick.bind(this);
-
       this.handleIncrDownFromVolume = this.handleMouseDownFromVolume.bind(this, true);
       this.handleDecrDownFromVolume = this.handleMouseDownFromVolume.bind(this, false);
-
-      this.handleMouseUpFromVolumeOnDecr = this.handleMouseUpFromVolume.bind(this,false);
-      this.handleMouseUpFromVolumeOnInc = this.handleMouseUpFromVolume.bind(this,true);
-
-      this.handleMouseDownFromTunerOnDecr = this.handleMouseDownFromTuner.bind(this,false);
-      this.handleMouseDownFromTunerOnInc = this.handleMouseDownFromTuner.bind(this,true);
-
       this.handleSwitchMouseUp = this.handleSwitchMouseAction.bind(this, false);
       this.handleSwitchMouseDown = this.handleSwitchMouseAction.bind(this, true);
-
-      this.handleMouseUpFromTunerOnDecr = this.handleMouseUpFromTuner.bind(this,false);
-      this.handleMouseUpFromTunerOnInc = this.handleMouseUpFromTuner.bind(this,true);
     }
 
     async componentDidMount(){
       this.retrieveDataAndLoadAudioFiles();
     }
-
     componentWillUnmount(){
       this.stopNoise();
       this.deactivateAudioStream();
@@ -102,6 +90,10 @@ class VirtualRadio extends React.Component{
                     </VolumeController>
             </div>
           </div>
+            <QuickChannelButtonList
+              data={data}
+                parentCallback={this.handleQuickChannelButtonClick}>
+            </QuickChannelButtonList>
           </div>
           </div>
         </div>
@@ -121,19 +113,15 @@ class VirtualRadio extends React.Component{
             <img className="oldRadioImg" src={design} alt="old radio"></img>
             <span className="tuner-span">
             <img id="tuner" className="tunerImg" src={tuner} alt="comp1"></img>
-            <span className="tunerLeftBtn" onMouseDown={this.handleMouseDownFromTunerOnDecr} onMouseUp={this.handleMouseUpFromTunerOnDecr}></span>
-            <span className="tunerRightBtn" onMouseDown={this.handleMouseDownFromTunerOnInc} onMouseUp={this.handleMouseUpFromTunerOnInc}></span>
+            <span className="tunerLeftBtn" onMouseDown={this.handleDecrDownFromTuner} onMouseUp={this.handleMouseUpFromTunerOnDecr}></span>
+            <span className="tunerRightBtn" onMouseDown={this.handleIncrDownFromTuner} onMouseUp={this.handleMouseUpFromTunerOnInc}></span>
             </span>
             <span className="vol-span">
               <img id="vol" className="volImg" src={volume} alt="comp2"></img>
               <span className="volLeftBtn" onMouseDown={this.handleDecrDownFromVolume} onMouseUp={this.handleMouseUpFromVolumeOnDecr} ></span>
               <span className="volRightBtn" onMouseDown={this.handleIncrDownFromVolume} onMouseUp={this.handleMouseUpFromVolumeOnInc}></span>
             </span>
-            <span id="powerSwitch" className="powerSwitch" onMouseDown={this.handleSwitchMouseDown} onMouseUp={this.handleSwitchMouseUp}></span>
-              <QuickChannelButtonList
-                  data={data}
-                  parentCallback={this.handleQuickChannelButtonClick}>
-              </QuickChannelButtonList>
+            <span id="powerSwitch" className="powSwitch" onMouseDown={this.handleSwitchMouseDown} onMouseUp={this.handleSwitchMouseUp}></span>
             <InfoBox
               top={-465}
               left={100}
@@ -164,12 +152,12 @@ class VirtualRadio extends React.Component{
     }
   }
 
-  handleSwitchMouseAction = (b, e) => {
-    let pow = e.target;
+  handleSwitchMouseAction = (b) => {
+    let pow = document.getElementById("powerSwitch");
     if(b){
-      pow.classList.add("channel-btn-clicked");
+      pow.classList.add("powSwitch-clicked");
     } else{
-      pow.classList.remove("channel-btn-clicked");
+      pow.classList.remove("powSwitch-clicked");
       this.handleToggleSwitchAction();
     }
   }
@@ -190,18 +178,30 @@ class VirtualRadio extends React.Component{
     }
   }
 
-  handleMouseUpFromVolume = (b) => {
+  handleMouseUpFromVolumeOnDecr = () => {
     var vol = document.getElementById("vol");
     vol.classList.remove("rotate-reverse");
     vol.classList.remove("rotate-normal");
     var milis = stopTimerGetTime();
     milis = milis/1000;
-    if(b) this.volDeg = (this.volDeg + ((milis*36)%360))%360;
-    else this.volDeg = (this.volDeg - ((milis*36)%360))%360;
+    this.volDeg = (this.volDeg - ((milis*36)%360))%360;
     changeAnimationRotation('rotate', this.volDeg);
     vol.style.transform = "rotate("+ this.volDeg +"deg)";
     clearInterval(this.volumeIntervalId);
   }
+
+  handleMouseUpFromVolumeOnInc = () =>{
+    var vol = document.getElementById("vol");
+    vol.classList.remove("rotate-reverse");
+    vol.classList.remove("rotate-normal");
+    var milis = stopTimerGetTime();
+    milis = milis/1000;
+    this.volDeg = (this.volDeg + ((milis*36)%360))%360;
+    changeAnimationRotation('rotate', this.volDeg);
+    vol.style.transform = "rotate("+ this.volDeg +"deg)";
+    clearInterval(this.volumeIntervalId);
+  }
+
 
   incrementVolumeValueFromInterval(){
     let vol = parseFloat(this.state.volumeValue);
@@ -225,23 +225,38 @@ class VirtualRadio extends React.Component{
       }
   }
 
-  handleMouseDownFromTuner = (b) => {
-    if(!b) this.tuner.onDecrement();
-    else this.tuner.onIncrement();
-
+  handleDecrDownFromTuner = () => {
+    this.tuner.onDecrDown();
     var pointer = document.getElementsByClassName('frequency-pointer')[0];
     pointer.style.marginLeft = this.state.targetFreq+"%";
     startTimer();
   }
 
-  handleMouseUpFromTuner = (b) => {
-    this.tuner.onMouseUp();
+  handleIncrDownFromTuner = () =>{
+    this.tuner.onIncrDown();
+    var pointer = document.getElementsByClassName('frequency-pointer')[0];
+    pointer.style.marginLeft = this.state.targetFreq+"%";
+    startTimer();
+  }
+
+  handleMouseUpFromTunerOnDecr = () =>{
+    this.tuner.onIncUp();
     var tunerImg = document.getElementsByClassName('tunerImg')[0];
     tunerImg.classList.remove('rotate-reverse');
     var milis = stopTimerGetTime();
     milis = milis/1000;
-    if(b) this.tunerDeg = (this.tunerDeg + ((milis*36)%360))%360;
-    else this.tunerDeg = (this.tunerDeg - ((milis*36)%360))%360;
+    this.tunerDeg = (this.tunerDeg - ((milis*36)%360))%360;
+    changeAnimationRotation('rotate', this.tunerDeg);
+    tunerImg.style.transform = "rotate("+ this.tunerDeg +"deg)";
+  }
+
+  handleMouseUpFromTunerOnInc = () =>{
+    this.tuner.onIncUp();
+    var tunerImg = document.getElementsByClassName('tunerImg')[0];
+    tunerImg.classList.remove('rotate-reverse');
+    var milis = stopTimerGetTime();
+    milis = milis/1000;
+    this.tunerDeg = (this.tunerDeg + ((milis*36)%360))%360;
     changeAnimationRotation('rotate', this.tunerDeg);
     tunerImg.style.transform = "rotate("+ this.tunerDeg +"deg)";
   }
@@ -277,6 +292,7 @@ class VirtualRadio extends React.Component{
   handleQuickChannelButtonClick = (channelID) => {
     const channelClicked = this.state.data.filter(channel => channel.id === channelID)[0];
     let newFreq = ((channelClicked.to_frequency + channelClicked.from_frequency) / 2).toFixed(3);
+
     var pointer = document.getElementsByClassName('frequency-pointer')[0];
     pointer.style.left =  newFreq*100+"%";
 
@@ -314,13 +330,14 @@ class VirtualRadio extends React.Component{
     if(this.state.isRadioLive){
       this.state.data.forEach( channel => {
         if(parseFloat(newFrequency,10) >= channel.from_frequency && parseFloat(newFrequency,10) <= channel.to_frequency){
-          if(!this.state.isChannelStreaming)  this.stopNoise();
-            else this.stopPlayingAudio(this.state.streamingChannelID);
+          if(!this.state.isChannelStreaming){
+            this.stopNoise();
             this.playAudio(channel.id);
-          this.setState({
-            isChannelStreaming : true,
-            streamingChannelID : channel.id
-          });
+            this.setState({
+              isChannelStreaming : true,
+              streamingChannelID : channel.id
+            });
+          }
           isStreamingActive = true;
         }
       });
@@ -352,7 +369,6 @@ class VirtualRadio extends React.Component{
     if(pausedRecently){
       var source2 = this.audioContext.createBufferSource();
       source2.connect(this.gainNode);
-      source2.loop = true;
       source2.buffer = audioBuffer;
       this.audioFiles[i].source = source2;
       this.audioFiles[i].startedAt = Date.now() - pausedAt;
@@ -385,11 +401,6 @@ class VirtualRadio extends React.Component{
     const token = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
 
     axios.get("https://radio.ethylomat.de/api/v1/channels/"
-      // ,{headers: {
-      //   'Authorization' : `Basic ${token}`,
-      //   "Content-Type": "application/json"
-      //   }
-      // }
     )
     .then( response =>{
       const json = response.data;
@@ -411,7 +422,7 @@ class VirtualRadio extends React.Component{
           for(let i = 0; i < data.length; i++){
             const source = this.audioContext.createBufferSource();
             var url = data[i].files[1].media_file;
-            let response = await axios.get('https://cors-anywhere.herokuapp.com/' + url,{
+            let response = await axios.get("https://cors-anywhere.herokuapp.com/" + url,{
               responseType: 'arraybuffer'
             });
             let audioBuffer = await this.audioContext.decodeAudioData(response.data);
@@ -426,7 +437,6 @@ class VirtualRadio extends React.Component{
             };
             this.audioFiles[i].source.connect(this.gainNode);
             this.gainNode.connect(this.audioContext.destination);
-            source.loop = true;
         }
 
           this.setState({
