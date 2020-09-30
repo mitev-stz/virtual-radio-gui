@@ -53,6 +53,7 @@ class VirtualRadio extends React.Component{
       this.retrieveDataAndLoadAudioFiles();
     }
     componentWillUnmount(){
+
       this.stopNoise();
       this.deactivateAudioStream();
     }
