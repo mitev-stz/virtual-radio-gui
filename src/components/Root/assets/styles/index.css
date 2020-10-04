@@ -47,10 +47,28 @@
 }
 .footer{
   user-select: none;
-  display: inline-block;
   position: fixed;
   text-align: center;
   top: 40%;
+  right: 2%;
+  border-radius: 10px;
+  background: rgba(202, 189, 102, 0.62);
+  color: #9c3b3b;
+  height: auto;
+  width: auto;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  grid-column: 3/4;
+  writing-mode: vertical-rl;
+  text-orientation: sideways;
+}
+.impressum{
+  user-select: none;
+  position: fixed;
+  text-align: center;
+  top: 60%;
   right: 2%;
   border-radius: 10px;
   background: rgba(202, 189, 102, 0.62);
@@ -70,10 +88,32 @@
   color:#c31d1dcc;
   cursor: pointer;
 }
+.impressum:hover{
+  background-color: rgb(241 212 20 / 62%);
+  color:#c31d1dcc;
+  cursor: pointer;
+}
 .contact-info{
   position: fixed;
   top: 45%;
   right: 4%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  height: 25%;
+  margin: 0;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  grid-column: 3/4;
+}
+.impressum-info{
+  position: fixed;
+  top: 66%;
+  right: 6%;
+  background-color: #f5cf8b;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 10px;
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
   height: 25%;

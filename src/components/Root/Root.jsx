@@ -42,6 +42,16 @@ class Root extends React.Component{
         <div className="footer" onClick={this.openCloseSocialContacts}>
           Contact us!
         </div>
+        <div className="impressum" onClick={this.openCloseImpressum}>
+          Impressum
+        </div>
+          <div className="impressum-info display-none">
+            <p>Yordan Mitev<br />
+            Stracin 6<br />69126 Stara Zagora, Bulgaria</p>
+          <p>Telefon: +359882733140<br />
+          E-Mail: <a href="mailto:yordan.mitev99@gmail.com">yordan.mitev99@gmail.com</a><br />
+            </p>
+          </div>
           <div className="contact-info display-none">
             {/*eslint-disable-next-line*/}
             <a href="https://facebook.com" className="fa fa-facebook" onClick={this.openCloseSocialContacts}></a>
@@ -65,6 +75,11 @@ class Root extends React.Component{
       contacts.classList.add("display-none");
       contacts.classList.remove("display-flex");
     }
+  }
+  openCloseImpressum = () =>{
+    var impressum = document.getElementsByClassName("impressum-info")[0];
+    if(impressum.classList.value.includes("display-none"))  impressum.classList.remove("display-none");
+      else impressum.classList.add("display-none");
   }
 }
 
