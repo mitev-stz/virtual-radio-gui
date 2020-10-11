@@ -1,8 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import PowerSwitch from "../PowerSwitch/PowerSwitch";
 import Tuner from "../Tuner/Tuner";
-import VolumeController from "../VolumeController/VolumeController";
 import QuickChannelButtonList from "../QuickChannelButtonList/QuickChannelButtonList";
 import ChannelDescription from "../ChannelDescription/ChannelDescription";
 import "./assets/styles/virtualRadio.css";
@@ -67,33 +65,17 @@ class VirtualRadio extends React.Component{
     } else {
       return (
         <div className="main-virtualradio background-white">
-          <div className="radio-container">
-          <div className="centered-container virtRadio">
-            <div className="radio-inner-case">
-              <div className="radio-front-case">
-                <div className="radio-panel">
-                    <PowerSwitch
-                      handleToggleSwitchAction={this.handleToggleSwitchAction}
-                      isRadioLive={isRadioLive}
-                    ></PowerSwitch>
-                    <Tuner
-                      onRef={ref => (this.tuner = ref)}
-                      targetFreq={targetFreq}
-                      isRadioLive={isRadioLive}
-                      data={data}
-                      isChannelStreaming={isChannelStreaming}
-                      streamingChannelID={streamingChannelID}
-                      parentCallback = {this.handleCallbackFromTuner}
-                      ></Tuner>
-                    <VolumeController
-                      parentCallback={this.changeVolumeValue}
-                      volumeValue={this.state.volumeValue}>
-                    </VolumeController>
-            </div>
+          <div className="display-none">
+              <Tuner
+                onRef={ref => (this.tuner = ref)}
+                targetFreq={targetFreq}
+                isRadioLive={isRadioLive}
+                data={data}
+                isChannelStreaming={isChannelStreaming}
+                streamingChannelID={streamingChannelID}
+                parentCallback = {this.handleCallbackFromTuner}
+              ></Tuner>
           </div>
-          </div>
-          </div>
-        </div>
         <div className="channel-description-for-image-container centered-container">
           <ChannelDescription
             channel={data.filter(channel => channel.id === streamingChannelID)[0]}
@@ -395,20 +377,11 @@ class VirtualRadio extends React.Component{
   }
 
   retrieveDataAndLoadAudioFiles(){
-    const username = 'admin';
-    const password = 'test123';
-    const token = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
-
     axios.get("https://radio.ethylomat.de/api/v1/channels/"
-      // ,{headers: {
-      //   'Authorization' : `Basic ${token}`,
-      //   "Content-Type": "application/json"
-      //   }
-      // }
     )
     .then( response =>{
       const json = response.data;
-      this.loadAudioFiles(json, token);
+      this.loadAudioFiles(json);
       this.setState({
         data: json,
       });
@@ -420,12 +393,11 @@ class VirtualRadio extends React.Component{
     });
   }
 
-  async loadAudioFiles(data, token){
+  async loadAudioFiles(data){
           this.gainNode.gain.value = this.state.volumeValue;
-
           for(let i = 0; i < data.length; i++){
             const source = this.audioContext.createBufferSource();
-            var url = data[i].files[1].media_file;
+            var url = data[i].files[0].media_file;
             let response = await axios.get("https://cors-anywhere.herokuapp.com/" + url,{
               responseType: 'arraybuffer'
             });
