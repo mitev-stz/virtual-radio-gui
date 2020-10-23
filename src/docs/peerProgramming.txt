@@ -1,0 +1,22 @@
+Peer Programming with Chris Protocol:
+Observer: Yordan Mitev
+
+Chris managed to explain how his implementation works and showed me some use cases of each functionality he has, for example for the logging.
+He also has a very good self-explainatory function names, although on some spots the logic is too complex.
+
+Documentation and Implementation:
+log.py has enough documentation and python rules are taken into account.
+config has enough documentation and python rules are taken into account.
+channel has enough documentation and python rules are taken into account.
+sync.py has enough documentation and python rules are taken into account.
+sync.py needs a use case example.
+
+Problems:
+In main.py -> use small functions for each task init, examples are setting up initital boundaries, set, tuner.
+Implement endless loop in main.py as a function with small functions for part of the complex logic within, needed is also a clean up of dublicate code
+ 
+ 
+
+
+
+

@@ -31,20 +31,27 @@ class VirtualRadio extends React.Component{
         isDataLoaded: false,
         errorOnLoad: null,
         isRadioLive: false,
-        volumeValue: 0.4,
+        volumeValue: 0.32,
         isChannelStreaming: false,
         streamingChannelID: -1
     };
 
     bindHandleMethods(){
-      this.handleToggleSwitchAction = this.handleToggleSwitchAction.bind(this);
       this.handleCallbackFromTuner = this.handleCallbackFromTuner.bind(this);
-      this.changeVolumeValue = this.changeVolumeValue.bind(this);
       this.handleQuickChannelButtonClick = this.handleQuickChannelButtonClick.bind(this);
+
       this.handleIncrDownFromVolume = this.handleMouseDownFromVolume.bind(this, true);
       this.handleDecrDownFromVolume = this.handleMouseDownFromVolume.bind(this, false);
+      this.handleDecrDownFromTuner = this.handleMouseDownFromTuner.bind(this, false);
+      this.handleIncrDownFromTuner = this.handleMouseDownFromTuner.bind(this, true);
+
       this.handleSwitchMouseUp = this.handleSwitchMouseAction.bind(this, false);
       this.handleSwitchMouseDown = this.handleSwitchMouseAction.bind(this, true);
+
+      this.handleMouseUpFromTunerOnDecr = this.handleMouseUpFromTuner.bind(this, false);
+      this.handleMouseUpFromTunerOnInc = this.handleMouseUpFromTuner.bind(this, true);
+      this.handleMouseUpFromVolumeOnInc = this.handleMouseUpFromVolume.bind(this,true);
+      this.handleMouseUpFromVolumeOnDecr = this.handleMouseUpFromVolume.bind(this,false);
     }
 
     async componentDidMount(){
@@ -135,167 +142,98 @@ class VirtualRadio extends React.Component{
     }
   }
 
-  handleSwitchMouseAction = (b, e) => {
+// Power Switch Handlers
+
+  handleSwitchMouseAction = (isOnMouseDown, e) => {
     let pow = e.target;
-    if(b){
+    if(isOnMouseDown){
       pow.classList.add("channel-btn-clicked");
     } else{
       pow.classList.remove("channel-btn-clicked");
-      this.handleToggleSwitchAction();
+      this.setState((prevstate) =>(
+        {
+          isRadioLive: !prevstate.isRadioLive
+        }
+      ));
+      this.setSteamingChannelFromPowerSwitch(!this.state.isRadioLive);
     }
   }
 
-  handleMouseDownFromVolume = (b) => {
+// Volume Handlers
+
+  handleMouseDownFromVolume = (isOnIncrement) => {
     var vol = document.getElementById("vol");
     startTimer();
-    if(b){
-      vol.classList.add("rotate-normal");
+    if(isOnIncrement){
+      this.addUIRotationNormal(vol);
       this.volumeIntervalId = window.setInterval(() => {
         this.incrementVolumeValueFromInterval();
       },100);
     } else {
-      vol.classList.add("rotate-reverse");
+      this.addUIRotationReverse(vol);
       this.volumeIntervalId = window.setInterval(() => {
         this.decrementVolumeValueFromInterval();
       },100);
     }
   }
 
-  handleMouseUpFromVolumeOnDecr = () => {
+  handleMouseUpFromVolume = (isOnIncrement) => {
     var vol = document.getElementById("vol");
-    vol.classList.remove("rotate-reverse");
-    vol.classList.remove("rotate-normal");
-    var milis = stopTimerGetTime();
-    milis = milis/1000;
-    this.volDeg = (this.volDeg - ((milis*36)%360))%360;
+    this.removeUIRotation(vol);
+    this.volDeg = this.calculateNewRotationDegrees(this.volDeg, isOnIncrement);
     changeAnimationRotation('rotate', this.volDeg);
     vol.style.transform = "rotate("+ this.volDeg +"deg)";
     clearInterval(this.volumeIntervalId);
   }
 
-  handleMouseUpFromVolumeOnInc = () =>{
-    var vol = document.getElementById("vol");
-    vol.classList.remove("rotate-reverse");
-    vol.classList.remove("rotate-normal");
-    var milis = stopTimerGetTime();
-    milis = milis/1000;
-    this.volDeg = (this.volDeg + ((milis*36)%360))%360;
-    changeAnimationRotation('rotate', this.volDeg);
-    vol.style.transform = "rotate("+ this.volDeg +"deg)";
-    clearInterval(this.volumeIntervalId);
-  }
-
-
-  incrementVolumeValueFromInterval(){
-    let vol = parseFloat(this.state.volumeValue);
-      if(vol+0.02<=1){
-        vol +=0.02;
-        this.setState({
-          volumeValue: vol
-        });
-        this.applyVolumeChangeOnAudio(vol);
-      }
-  }
-
-  decrementVolumeValueFromInterval(){
-    let vol = parseFloat(this.state.volumeValue);
-      if(vol-0.02>=0){
-        vol -=0.02;
-        this.setState({
-          volumeValue: vol
-        });
-        this.applyVolumeChangeOnAudio(vol);
-      }
-  }
-
-  handleDecrDownFromTuner = () => {
-    this.tuner.onDecrDown();
-    var pointer = document.getElementsByClassName('frequency-pointer')[0];
-    pointer.style.marginLeft = this.state.targetFreq+"%";
+  handleMouseDownFromTuner = (isOnIncrement) => {
+    if(isOnIncrement) this.tuner.handleMouseDownOnIncrement();
+      else this.tuner.handleMouseDownOnDecrement();
+    this.updatePointerPositionUI(this.state.targetFreq);
     startTimer();
   }
 
-  handleIncrDownFromTuner = () =>{
-    this.tuner.onIncrDown();
-    var pointer = document.getElementsByClassName('frequency-pointer')[0];
-    pointer.style.marginLeft = this.state.targetFreq+"%";
-    startTimer();
-  }
+//  Tuner Handlers
 
-  handleMouseUpFromTunerOnDecr = () =>{
-    this.tuner.onIncUp();
+  handleMouseUpFromTuner = (isOnIncrement) =>{
+    this.tuner.mouseUpClearInterval();
     var tunerImg = document.getElementsByClassName('tunerImg')[0];
-    tunerImg.classList.remove('rotate-reverse');
-    var milis = stopTimerGetTime();
-    milis = milis/1000;
-    this.tunerDeg = (this.tunerDeg - ((milis*36)%360))%360;
-    changeAnimationRotation('rotate', this.tunerDeg);
-    tunerImg.style.transform = "rotate("+ this.tunerDeg +"deg)";
-  }
-
-  handleMouseUpFromTunerOnInc = () =>{
-    this.tuner.onIncUp();
-    var tunerImg = document.getElementsByClassName('tunerImg')[0];
-    tunerImg.classList.remove('rotate-reverse');
-    var milis = stopTimerGetTime();
-    milis = milis/1000;
-    this.tunerDeg = (this.tunerDeg + ((milis*36)%360))%360;
-    changeAnimationRotation('rotate', this.tunerDeg);
-    tunerImg.style.transform = "rotate("+ this.tunerDeg +"deg)";
-  }
-
-  changeVolumeValue = (volumeControllerData) => {
-    this.setState({
-      volumeValue: volumeControllerData
-    });
-    this.applyVolumeChangeOnAudio(volumeControllerData);
-  }
-
-  handleToggleSwitchAction(){
-    this.setState((prevstate) =>(
-      {
-        isRadioLive: !prevstate.isRadioLive
-      }
-    ));
-    this.setSteamingChannelFromPowerSwitch(!this.state.isRadioLive);
+    this.removeUIRotation(tunerImg);
+    this.tunerDeg = this.calculateNewRotationDegrees(this.tunerDeg, isOnIncrement);
+    this.transformRotationAnimation(tunerImg, this.tunerDeg);
   }
 
   handleCallbackFromTuner = (freqFromTuner) => {
-    let newFreq = freqFromTuner.toFixed(3);
+    let newFreq = parseFloat(freqFromTuner,10).toFixed(3);
     this.setState({
       targetFreq: newFreq
     });
-
-    var pointer = document.getElementsByClassName('frequency-pointer')[0];
-    pointer.style.left =  this.state.targetFreq*100+"%";
-
+    this.updatePointerPositionUI(newFreq);
     this.setSteamingChannelFromFrequency(freqFromTuner);
   }
 
+// Buttons Handlers
+
   handleQuickChannelButtonClick = (channelID) => {
     const channelClicked = this.state.data.filter(channel => channel.id === channelID)[0];
-    let newFreq = ((channelClicked.to_frequency + channelClicked.from_frequency) / 2).toFixed(3);
-    var pointer = document.getElementsByClassName('frequency-pointer')[0];
-    pointer.style.left =  newFreq*100+"%";
-
-    this.setState({
-      targetFreq: newFreq
-    });
-    this.setSteamingChannelFromFrequency(newFreq);
+    let newFreq = ((parseFloat(channelClicked.to_frequency,10) + parseFloat(channelClicked.from_frequency,10)) / 2).toFixed(3);
+    this.tuner.setTargetFreqAndCallback(newFreq);
   }
 
-  setSteamingChannelFromPowerSwitch(isPowerOn){
-    if(isPowerOn){
+// Main functionality functions - for steaming channel or playing noise sound, turning on/off the radio, changing volume strength
+
+  setSteamingChannelFromPowerSwitch(isRadioLive){
+    if(isRadioLive){
       let frequency = parseFloat(this.state.targetFreq);
       let isChannelTargeted = false;
       this.state.data.forEach( channel => {
         if(frequency >= channel.from_frequency &&  frequency <= channel.to_frequency){
           isChannelTargeted = true;
-            this.playAudio(channel.id);
-            this.setState({
-              isChannelStreaming : true,
-              streamingChannelID : channel.id
-            });
+          this.playAudio(channel.id);
+          this.setState({
+            isChannelStreaming : true,
+            streamingChannelID : channel.id
+          });
         }
       });
       if(!isChannelTargeted){
@@ -314,7 +252,7 @@ class VirtualRadio extends React.Component{
         if(parseFloat(newFrequency,10) >= channel.from_frequency && parseFloat(newFrequency,10) <= channel.to_frequency){
           if(!this.state.isChannelStreaming)  this.stopNoise();
             else this.stopPlayingAudio(this.state.streamingChannelID);
-            this.playAudio(channel.id);
+          this.playAudio(channel.id);
           this.setState({
             isChannelStreaming : true,
             streamingChannelID : channel.id
@@ -339,7 +277,7 @@ class VirtualRadio extends React.Component{
     });
   }
 
-  applyVolumeChangeOnAudio = (level) => {
+  setVolumeInGainNode = (level) => {
     this.gainNode.gain.value = level * level;
   };
 
@@ -375,6 +313,123 @@ class VirtualRadio extends React.Component{
     }
     return -1;
   }
+
+  playNoise(){
+    if(!this.isNoiseRunning){
+      const noise = this.audioContext.createBufferSource();
+      noise.buffer = this.noiseBuffer;
+      noise.loop = true;
+      noise.connect(this.gainNode);
+      noise.start(this.audioContext.currentTime);
+      this.noise = noise;
+      this.isNoiseRunning = true;
+    }
+
+  }
+
+  stopNoise(){
+    if(this.isNoiseRunning){
+      this.isNoiseRunning = false;
+      this.noise.stop(this.audioContext.currentTime);
+    }
+  }
+
+// Calculations for the increment/decrement step change of interval, noise definition as brown noise
+
+  incrementVolumeValueFromInterval(){
+    let vol = parseFloat(this.state.volumeValue);
+      if(vol+0.02<=1){
+        vol +=0.02;
+        this.setState({
+          volumeValue: vol
+        });
+        this.setVolumeInGainNode(vol);
+      }
+  }
+
+  decrementVolumeValueFromInterval(){
+    let vol = parseFloat(this.state.volumeValue);
+      if(vol-0.02>=0){
+        vol -=0.02;
+        this.setState({
+          volumeValue: vol
+        });
+        this.setVolumeInGainNode(vol);
+      }
+  }
+
+  generateBrownNoise(context){
+    var bufferSize = 2 * context.sampleRate;
+    var brownBuffer = context.createBuffer(
+      1,
+      bufferSize,
+      context.sampleRate
+    );
+    var noiseData = brownBuffer.getChannelData(0);
+    var lastOut = 0.0;
+    for (var i = 0; i < bufferSize; i++) {
+      var white = Math.random() * 2 - 1;
+      noiseData[i] = (lastOut + 0.02 * white) / 1.02;
+      lastOut = noiseData[i];
+      noiseData[i] *= 3.5;
+    }
+    return brownBuffer;
+  }
+
+  getAudioContext(){
+      const audioContext = new AudioContext();
+      return audioContext;
+
+    };
+
+  calculateNewRotationDegrees(degrees, isClockwise){
+    var milis = stopTimerGetTime();
+    milis = milis/1000;
+    if(isClockwise) return (degrees + ((milis*36)%360))%360;
+    else return (degrees - ((milis*36)%360))%360;
+  }
+
+// UI functions - rotation, freq-pointer usw...
+
+  transformRotationAnimation = (UIelement, rotationDegrees) => {
+    changeAnimationRotation('rotate', this.tunerDeg);
+    UIelement.style.transform = "rotate("+ this.tunerDeg +"deg)";
+  }
+
+  updatePointerPositionUI = (newFreq) => {
+    var pointer = document.getElementsByClassName('frequency-pointer')[0];
+    pointer.style.left =  newFreq*100+"%";
+  }
+
+  removeUIRotation = (targetID) => {
+    targetID.classList.remove("rotate-reverse");
+    targetID.classList.remove("rotate-normal");
+  }
+
+  addUIRotationReverse = (targetID) => {
+    targetID.classList.add("rotate-reverse");
+  }
+
+  addUIRotationNormal = (targetID) => {
+    targetID.classList.add("rotate-normal");
+  }
+
+  closeInfoBox(){
+    let elements = document.getElementsByClassName("info-box");
+    for(let i = 0; i < elements.length; i++){
+      let el = elements[i];
+      el.style.animation = "fade-out 2s normal";
+      el.style.animationFillMode = "forwards";
+    }
+    setTimeout(function(){
+      let elements = document.getElementsByClassName("info-box");
+      for(let j=0; j< elements.length; j++){
+        elements[j].remove();
+      }
+    },1200);
+  }
+
+// API fetch call and data load in component state
 
   retrieveDataAndLoadAudioFiles(){
     axios.get("https://radio.ethylomat.de/api/v1/channels/"
@@ -422,64 +477,6 @@ class VirtualRadio extends React.Component{
           });
   }
 
-  playNoise(){
-    if(!this.isNoiseRunning){
-      const noise = this.audioContext.createBufferSource();
-      noise.buffer = this.noiseBuffer;
-      noise.loop = true;
-      noise.connect(this.gainNode);
-      noise.start(this.audioContext.currentTime);
-      this.noise = noise;
-      this.isNoiseRunning = true;
-    }
-
-  }
-
-  stopNoise(){
-    if(this.isNoiseRunning){
-      this.isNoiseRunning = false;
-      this.noise.stop(this.audioContext.currentTime);
-    }
-  }
-
-  generateBrownNoise(context){
-    var bufferSize = 2 * context.sampleRate;
-    var brownBuffer = context.createBuffer(
-      1,
-      bufferSize,
-      context.sampleRate
-    );
-    var noiseData = brownBuffer.getChannelData(0);
-    var lastOut = 0.0;
-    for (var i = 0; i < bufferSize; i++) {
-      var white = Math.random() * 2 - 1;
-      noiseData[i] = (lastOut + 0.02 * white) / 1.02;
-      lastOut = noiseData[i];
-      noiseData[i] *= 3.5;
-    }
-    return brownBuffer;
-  }
-
-  getAudioContext(){
-      const audioContext = new AudioContext();
-      return audioContext;
-
-    };
-
-  closeInfoBox(){
-    let elements = document.getElementsByClassName("info-box");
-    for(let i = 0; i < elements.length; i++){
-      let el = elements[i];
-      el.style.animation = "fade-out 2s normal";
-      el.style.animationFillMode = "forwards";
-    }
-    setTimeout(function(){
-      let elements = document.getElementsByClassName("info-box");
-      for(let j=0; j< elements.length; j++){
-        elements[j].remove();
-      }
-    },3000);
-  }
 }
 
 export default VirtualRadio;
