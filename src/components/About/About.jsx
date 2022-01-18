@@ -24,7 +24,7 @@ const About = () =>(
       <div style={{width:"80%"}}>
        Hi, my name is Yordan and I'm from Bulgaria. I was born in Stara Zagora, a city right in the middle of the land.
        Right now I'm studying mathematics at the university of Heidelberg, Germany. I strive for a bachelor degree and I'm half way there.
-       I'm participating in this project as part of my software praktikum. I was responsible for the development of the virtual radio frontend.
+       I'm participating in this project as part of my interdisciplanary practical courses. I was responsible for the development of the virtual radio frontend.
        My interests involve web development, regression and interpolation as well as russian literature. I am also an active chess player.
      </div>
        <img src={imgYordan} alt="hello" style={{height:"277px", width:"205px"}}></img>
